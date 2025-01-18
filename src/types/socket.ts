@@ -1,10 +1,8 @@
 import { Server } from 'socket.io';
 import { ErrorFromServer } from '../utils/error';
-import { Member, Room } from '../Game/Room';
+import { Member } from '@/models/Member';
 
 type CallbackFunction = (data: unknown, error?: ErrorFromServer) => void;
-
-export type RoomInfoMapType = Map<string, Room>;
 
 export interface ServerToClientEvents {
   'new-user': (member: Member) => void;

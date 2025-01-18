@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io';
-import { IoType, RoomInfoMapType } from '../../types/socket';
+import { IoType } from '../../types/socket';
+import { RoomInfoMapType } from '@/types/game';
 
 export const onSocketConnectHandler = (io: IoType, socket: Socket) => {
   console.log('User connected :', socket.id);
@@ -22,7 +23,7 @@ export const onSocketDisconnectHandler = (
 
     // End a game if there is only one member left
     if (nMembersLeft && nMembersLeft < 2) {
-      room?.lobby();
+      room?.lobbyGame();
     }
 
     // Delete the room if you are its owner or if you were the only member

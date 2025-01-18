@@ -1,42 +1,33 @@
+import { GameStatus, RoomMode } from '@/types/game';
+import {
+  DEFAULT_CAPACITY,
+  DEFAULT_MAX_ROUNDS,
+  DEFAULT_MAX_TIME
+} from '../constants/game';
 import { IoType } from '../types/socket';
 import { ErrorFromServer } from '../utils/error';
 import { generateId } from '../utils/unique';
-
-type GameStatus = 'game' | 'lobby' | 'end';
-
-type RoomType = 'public' | 'private';
-
-export class Member {
-  id: string;
-  name: string;
-  avatar: object;
-
-  constructor(id: string, name: string, avatar: object) {
-    this.id = id;
-    this.name = name;
-    this.avatar = avatar;
-  }
-}
+import { Member } from './Member';
 
 export class Room {
-  capacity = 2;
-  id: string;
+  // Defaults
+  currentRound = 0;
+  capacity = DEFAULT_CAPACITY;
+  maxRounds = DEFAULT_MAX_ROUNDS;
+  maxTime = DEFAULT_MAX_TIME;
   members = new Array<Member>();
-  type: RoomType;
-  status: GameStatus;
+  status: GameStatus = GameStatus.LOBBY;
+
+  // Customs
+  id: string;
+  type: RoomMode;
   ownerId?: string;
   io: IoType;
 
-  constructor(
-    io: IoType,
-    type: 'public' | 'private',
-    status: 'game' | 'lobby',
-    ownerId?: string
-  ) {
+  constructor(io: IoType, type: RoomMode, ownerId?: string) {
     this.io = io;
-    this.id = generateId();
+    this.id = generateId(); // TODO: handle collision
     this.type = type;
-    this.status = status;
     this.ownerId = ownerId;
   }
 
@@ -90,21 +81,28 @@ export class Room {
     };
   }
 
+  // Start a round
+  startNextRound() {
+    if (this.currentRound === this.maxRounds) return;
+    this.currentRound += 1;
+  }
+
   // Start the game
-  start() {
-    this.status = 'game';
+  startGame() {
+    this.status = GameStatus.GAME;
     this.io.to(this.id).emit('game-start');
+    this.startNextRound();
   }
 
   // End the game
-  end() {
-    this.status = 'end';
+  endGame() {
+    this.status = GameStatus.END;
     this.io.to(this.id).emit('game-end');
   }
 
   // Lobby the game
-  lobby() {
-    this.status = 'lobby';
+  lobbyGame() {
+    this.status = GameStatus.LOBBY;
     this.io.to(this.id).emit('game-lobby');
   }
 }

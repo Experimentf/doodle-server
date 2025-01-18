@@ -1,6 +1,8 @@
 import { Socket } from 'socket.io';
-import { IoType, RoomInfoMapType } from '../../types/socket';
-import { Member, Room } from '../../Game/Room';
+import { IoType } from '../../types/socket';
+import { Room } from '../../models/Room';
+import { Member } from '@/models/Member';
+import { RoomInfoMapType, RoomMode } from '@/types/game';
 
 const getRandomRoom = (roomsInfoMap: RoomInfoMapType) => {
   const nRooms = roomsInfoMap.size;
@@ -23,7 +25,7 @@ export const onPlayPublicGameHandler = (
 
   // Find public rooms that have capacity
   for (const [roomId, roomInfo] of rooms.entries()) {
-    if (roomInfo.type === 'private') continue;
+    if (roomInfo.type === RoomMode.PRIVATE) continue;
     if (roomInfo.hasCapacity()) validRooms.set(roomId, roomInfo);
   }
 
@@ -35,7 +37,7 @@ export const onPlayPublicGameHandler = (
     room = getRandomRoom(validRooms) as Room;
   } else {
     // Otherwise, create a new public room
-    room = new Room(io, 'public', 'lobby');
+    room = new Room(io, RoomMode.PUBLIC);
     rooms.set(room.id, room);
   }
 

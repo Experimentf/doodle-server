@@ -9,13 +9,12 @@ import {
 import {
   ClientToServerEvents,
   InterServerEvents,
-  RoomInfoMapType,
   ServerToClientEvents,
   SocketData
 } from './types/socket';
 import { ErrorFromServer } from './utils/error';
 import { onPlayPublicGameHandler } from './handlers/socket/rooms';
-import { Room } from './Game/Room';
+import { RoomInfoMapType, RoomMode } from './types/game';
 
 config();
 
@@ -30,14 +29,8 @@ const io = new Server<
   SocketData
 >(httpServer, { cors: { origin: '*' } });
 
-// Information regarding rooms
-const rooms: RoomInfoMapType = new Map<string, Room>();
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getRoomDetails = (roomId: string) => {
-  if (rooms.has(roomId)) return rooms.get(roomId);
-  throw new ErrorFromServer('Room not found!');
-};
+// Rooms information is saved temporarily on server
+const rooms: RoomInfoMapType = new Map();
 
 // Socket
 io.on('connection', (socket) => {
@@ -74,8 +67,16 @@ io.on('connection', (socket) => {
   // Get the game details
   socket.on('get-game-details', (roomId, callback) => {
     const room = rooms.get(roomId);
-    if (room && room?.getNumberOfMembers() > 1) {
-      room.start();
+    if (!room) {
+      callback(null, new ErrorFromServer('Room not found'));
+    }
+    // Start the game if room is public and more than 1 member in the room
+    if (
+      room &&
+      room.type === RoomMode.PUBLIC &&
+      room.getNumberOfMembers() > 1
+    ) {
+      room.startGame();
     }
     callback(room?.getJSON());
   });
