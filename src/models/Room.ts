@@ -1,13 +1,13 @@
-import { GameStatus, RoomMode } from '@/types/game';
-
 import {
   DEFAULT_CAPACITY,
   DEFAULT_MAX_ROUNDS,
   DEFAULT_MAX_TIME
 } from '@/constants/game';
+import { GameStatus, RoomMode } from '@/types/game';
 import { IoType } from '@/types/socket';
 import { ErrorFromServer } from '@/utils/error';
 import { generateId } from '@/utils/unique';
+
 import { Member } from './Member';
 
 export class Room {
