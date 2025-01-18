@@ -13,8 +13,29 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "prettier"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "plugins": ["import", "@typescript-eslint", "prettier", "simple-import-sort"],
   "rules": {
-    "prettier/prettier": "error"
-  }
+    "simple-import-sort/imports": "error",
+    "import/no-unresolved": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-empty-function": "off"
+      }
+    },
+    {
+      "files": ["*.ts", "*.json"],
+      "rules": {
+        "prettier/prettier": "error"
+      }
+    }
+  ]
 }

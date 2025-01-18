@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io';
-import { IoType } from '../../types/socket';
+
 import { RoomInfoMapType } from '@/types/game';
+import { IoType } from '@/types/socket';
 
 export const onSocketConnectHandler = (io: IoType, socket: Socket) => {
   console.log('User connected :', socket.id);

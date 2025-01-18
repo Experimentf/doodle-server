@@ -1,8 +1,9 @@
 import { Socket } from 'socket.io';
-import { IoType } from '../../types/socket';
-import { Room } from '../../models/Room';
+
 import { Member } from '@/models/Member';
+import { Room } from '@/models/Room';
 import { RoomInfoMapType, RoomMode } from '@/types/game';
+import { IoType } from '@/types/socket';
 
 const getRandomRoom = (roomsInfoMap: RoomInfoMapType) => {
   const nRooms = roomsInfoMap.size;

@@ -2,19 +2,20 @@ import { config } from 'dotenv';
 import express, { Application } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+
 import {
   onSocketConnectHandler,
   onSocketDisconnectHandler
-} from './handlers/socket/connection';
+} from '@/handlers/socket/connection';
+import { onPlayPublicGameHandler } from '@/handlers/socket/rooms';
+import { RoomInfoMapType, RoomMode } from '@/types/game';
 import {
   ClientToServerEvents,
   InterServerEvents,
   ServerToClientEvents,
   SocketData
-} from './types/socket';
-import { ErrorFromServer } from './utils/error';
-import { onPlayPublicGameHandler } from './handlers/socket/rooms';
-import { RoomInfoMapType, RoomMode } from './types/game';
+} from '@/types/socket';
+import { ErrorFromServer } from '@/utils/error';
 
 config();
 

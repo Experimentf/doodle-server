@@ -1,6 +1,8 @@
 import { Server } from 'socket.io';
-import { ErrorFromServer } from '../utils/error';
+
 import { Member } from '@/models/Member';
+
+import { ErrorFromServer } from '@/utils/error';
 
 type CallbackFunction = (data: unknown, error?: ErrorFromServer) => void;
 
