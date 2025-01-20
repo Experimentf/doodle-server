@@ -1,109 +1,76 @@
-import {
-  DEFAULT_CAPACITY,
-  DEFAULT_MAX_ROUNDS,
-  DEFAULT_MAX_TIME
-} from '@/constants/game';
-import { GameStatus, RoomMode } from '@/types/game';
-import { IoType } from '@/types/socket';
-import { ErrorFromServer } from '@/utils/error';
+import { DEFAULT_CAPACITY } from '@/constants/game';
+import { GameStatus } from '@/types/game';
 import { generateId } from '@/utils/unique';
 
-import { Member } from './Member';
+import { DoodlerModel } from './Doodler';
 
-export class Room {
-  // Defaults
-  currentRound = 0;
-  capacity = DEFAULT_CAPACITY;
-  maxRounds = DEFAULT_MAX_ROUNDS;
-  maxTime = DEFAULT_MAX_TIME;
-  members = new Array<Member>();
-  status: GameStatus = GameStatus.LOBBY;
+export class RoomModel {
+  // Public Variables
+  public readonly id: string;
+  public readonly doodlers = new Array<DoodlerModel>();
+  public readonly isPrivate: boolean;
 
-  // Customs
-  id: string;
-  type: RoomMode;
-  ownerId?: string;
-  io: IoType;
+  // Private Variables
+  private ownerId?: string;
+  private capacity = DEFAULT_CAPACITY;
+  private status: GameStatus = GameStatus.LOBBY;
 
-  constructor(io: IoType, type: RoomMode, ownerId?: string) {
-    this.io = io;
+  constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
-    this.type = type;
-    this.ownerId = ownerId;
+    this.isPrivate = ownerId !== undefined;
+    this.setOwner(ownerId);
   }
 
-  // Does the room have capacity ?
-  hasCapacity() {
-    return this.members.length < this.capacity;
+  // Public Methods
+
+  // Returns the current number of members
+  public get currentSize() {
+    return this.doodlers.length;
   }
 
-  // Add a new member to the room
-  addMember(member: Member) {
-    if (this.members.length === this.capacity)
-      throw new ErrorFromServer('Room capacity reached!');
-    this.members.push(member);
+  // Returns the current owner of the room
+  public getOwnerId() {
+    return this.ownerId;
   }
 
-  // Remove a member from the room
-  removeMember(id: string) {
-    const newMembers = this.members.filter((member) => member.id !== id);
-    const memberToBeRemoved = this.members.find((member) => member.id === id);
-    this.members = newMembers;
-    return memberToBeRemoved;
+  // Add a new doodler to the room
+  public addDoodler(doodler: DoodlerModel) {
+    if (this.doodlers.length === this.capacity) return false;
+    this.doodlers.push(doodler);
+    return true;
   }
 
-  // Members in the room
-  getMembers() {
-    return this.members;
+  // Remove a doodler from the room
+  public removeDoodler(doodlerId: string) {
+    const index = this.doodlers.findIndex(({ id }) => id === doodlerId);
+    if (index === -1) return false;
+    this.doodlers.splice(index, 1);
+    return true;
   }
 
-  // Get the number of members in the room
-  getNumberOfMembers() {
-    return this.members.length;
+  // Find a doodler in the room
+  public findDoodler(doodlerId: string) {
+    return this.doodlers.find(({ id }) => id === doodlerId);
   }
 
-  // Check if the member is an owner of this room
-  isOwner(id: string) {
-    return this.ownerId === id;
+  // Get a random doodler
+  public get randomDoodler() {
+    const index = Math.round(Math.random() * (this.currentSize - 1));
+    return this.doodlers[index];
   }
 
-  // Get room details in json
-  getJSON() {
-    return {
-      capacity: this.capacity,
-      status: this.status,
-      type: this.type,
-      members: this.members.map((member) => ({
-        id: member.id,
-        name: member.name,
-        avatar: member.avatar,
-        isOwner: this.ownerId === member.id
-      }))
-    };
+  // Set an onwer
+  public setOwner(doodlerId?: string) {
+    this.ownerId = doodlerId;
   }
 
-  // Start a round
-  startNextRound() {
-    if (this.currentRound === this.maxRounds) return;
-    this.currentRound += 1;
+  // Check if the doodler is an owner of this room
+  public isOwner(doodlerId: string) {
+    return this.ownerId === doodlerId;
   }
 
-  // Start the game
-  startGame() {
-    this.status = GameStatus.GAME;
-    this.io.to(this.id).emit('game-start');
-    this.startNextRound();
-  }
-
-  // End the game
-  endGame() {
-    this.status = GameStatus.END;
-    this.io.to(this.id).emit('game-end');
-  }
-
-  // Lobby the game
-  lobbyGame() {
-    this.status = GameStatus.LOBBY;
-    this.io.to(this.id).emit('game-lobby');
+  // Returns if the room has no doodlers
+  public isEmpty() {
+    return this.doodlers.length === 0;
   }
 }

@@ -1,8 +1,8 @@
 export class ErrorFromServer extends Error {
-  constructor(message: string) {
+  constructor(message?: string) {
     super(message);
     this.name = 'ErrorFromServer';
-    this.message = message;
+    this.message = message ?? 'Something went wrong!';
   }
 
   toJSON() {

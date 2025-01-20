@@ -1,4 +1,4 @@
-import { Room } from '@/models/Room';
+import { RoomModel } from '@/models/Room';
 
 export enum GameStatus {
   GAME = 'game',
@@ -11,4 +11,4 @@ export enum RoomMode {
   PRIVATE = 'private'
 }
 
-export type RoomInfoMapType = Map<string, Room>;
+export type RoomInfoMapType = Map<string, RoomModel>;
