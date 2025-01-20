@@ -3,7 +3,6 @@ import GameService from '@/services/game';
 import RoomServiceInstance from '@/services/room';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
 import { DoodlerEvents, GameEvents, RoomEvents } from '@/types/socket/events';
-import { ErrorFromServer } from '@/utils/error';
 
 interface SocketControllerInterface {
   setSocket: (socket: SocketType) => void;
@@ -56,6 +55,7 @@ class SocketController implements SocketControllerInterface {
   public handleSocketOnDisconnect() {
     if (!this.socket) return;
     const socket = this.socket;
+    DoodlerServiceInstance.removeDoodler(socket.id);
     console.log('User disconnected :', socket.id);
   }
 
@@ -69,13 +69,14 @@ class SocketController implements SocketControllerInterface {
   ) => {
     if (!this.socket) return;
     const socket = this.socket;
-    const name = socket.data.name;
-    const avatar = socket.data.avatar;
-    if (!name || !avatar) {
-      const error = new ErrorFromServer('User does not exist');
+    const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
+    if (error || !data) {
       respond(null, error);
       return;
     }
+    const {
+      doodler: { name }
+    } = data;
     respond({ name });
   };
 
@@ -87,11 +88,9 @@ class SocketController implements SocketControllerInterface {
   public handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET] = (
     doodler
   ) => {
-    const { name, avatar } = doodler;
     if (!this.socket) return;
     const socket = this.socket;
-    socket.data.name = name;
-    socket.data.avatar = avatar;
+    DoodlerServiceInstance.addDoodler({ id: socket.id, ...doodler }); // TODO: Handle Error
   };
 
   /**

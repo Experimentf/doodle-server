@@ -9,6 +9,7 @@ interface DoodlerServiceInterface {
     name: string;
     avatar: object;
   }) => ServiceResponse<{ doodlerId: string }>;
+  removeDoodler: (doodlerId: string) => ServiceResponse<boolean>;
   findDooder: (doodlerId: string) => ServiceResponse<{ doodler: DoodlerModel }>;
 }
 
@@ -32,6 +33,15 @@ class DoodlerService implements DoodlerServiceInterface {
     const doodler = new DoodlerModel(id, name, avatar);
     this.doodlers.set(id, doodler);
     return SuccessResponse({ doodlerId: doodler.id });
+  }
+
+  /**
+   *
+   * @param doodlerId Doddler's id that needs to be removed
+   * @returns true | false
+   */
+  public removeDoodler(doodlerId: string) {
+    return SuccessResponse(this.doodlers.delete(doodlerId));
   }
 
   /**
