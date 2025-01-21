@@ -10,10 +10,10 @@ interface SocketControllerInterface {
   handleSocketOnDisconnecting: () => void;
   handleSocketOnDisconnect: () => void;
 
-  handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET];
-  handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET];
+  handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER];
+  handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER];
 
-  handleGameOnPlayPublicGame: ClientToServerEvents[GameEvents.ON_PLAY_PUBLIC_GAME];
+  handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM];
 }
 
 class SocketController implements SocketControllerInterface {
@@ -37,7 +37,7 @@ class SocketController implements SocketControllerInterface {
     socket.rooms.forEach((roomId) => {
       const doodlerId = socket.id;
       RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId); // TODO: Handle Error
-      socket.to(roomId).emit(RoomEvents.EMIT_USER_LEAVE, {
+      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
         id: doodlerId,
         name: socket.data.name
       });
@@ -45,6 +45,7 @@ class SocketController implements SocketControllerInterface {
       if (!isValidGame) {
         socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
       }
+      DoodlerServiceInstance.removeDoodler(socket.id); // TODO: Handle Error
     });
   }
 
@@ -55,7 +56,6 @@ class SocketController implements SocketControllerInterface {
   public handleSocketOnDisconnect() {
     if (!this.socket) return;
     const socket = this.socket;
-    DoodlerServiceInstance.removeDoodler(socket.id);
     console.log('User disconnected :', socket.id);
   }
 
@@ -64,40 +64,38 @@ class SocketController implements SocketControllerInterface {
    * @param respond - Respond to the client
    * @returns
    */
-  public handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET] = (
-    respond
-  ) => {
-    if (!this.socket) return;
-    const socket = this.socket;
-    const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
-    if (error || !data) {
-      respond(null, error);
-      return;
-    }
-    const {
-      doodler: { name }
-    } = data;
-    respond({ name });
-  };
+  public handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER] =
+    (respond) => {
+      if (!this.socket) return;
+      const socket = this.socket;
+      const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
+      if (error || !data) {
+        respond(null, error);
+        return;
+      }
+      const {
+        doodler: { name }
+      } = data;
+      respond({ name });
+    };
 
   /**
    * Handle when the client wants to set their info
    * @param doodler - Doodler information provided by the client
    * @returns
    */
-  public handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET] = (
-    doodler
-  ) => {
-    if (!this.socket) return;
-    const socket = this.socket;
-    DoodlerServiceInstance.addDoodler({ id: socket.id, ...doodler }); // TODO: Handle Error
-  };
+  public handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER] =
+    (doodler) => {
+      if (!this.socket) return;
+      const socket = this.socket;
+      DoodlerServiceInstance.addDoodler({ id: socket.id, ...doodler }); // TODO: Handle Error
+    };
 
   /**
    * Handle when the client wants to play a public game
    * @param respond - Respond to the client
    */
-  public handleGameOnPlayPublicGame: ClientToServerEvents[GameEvents.ON_PLAY_PUBLIC_GAME] =
+  public handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM] =
     (respond) => {
       if (!this.socket) return;
       const socket = this.socket;
@@ -120,7 +118,7 @@ class SocketController implements SocketControllerInterface {
       socket.join(roomId);
 
       // Let other users in the room know
-      socket.to(roomId).emit(RoomEvents.EMIT_NEW_USER, doodler);
+      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, doodler);
 
       respond({ roomId });
     };

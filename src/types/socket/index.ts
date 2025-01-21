@@ -9,29 +9,31 @@ import { DoodlerEvents, GameEvents, RoomEvents } from './events';
 type RespondFunction<T> = (data?: T | null, error?: ErrorFromServer) => void;
 
 interface ClientToServerEventsArguments {
-  [DoodlerEvents.ON_GET]: [RespondFunction<Partial<DoodlerModel>>];
-  [DoodlerEvents.ON_SET]: [{ name: string; avatar: object }];
-  [GameEvents.ON_PLAY_PUBLIC_GAME]: [RespondFunction<{ roomId: string }>];
+  [DoodlerEvents.ON_GET_DOODLER]: [RespondFunction<Partial<DoodlerModel>>];
+  [DoodlerEvents.ON_SET_DOODLER]: [{ name: string; avatar: object }];
+  [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: [
+    RespondFunction<{ roomId: string }>
+  ];
   [GameEvents.ON_GET_GAME_DETAILS]: [string, RespondFunction<RoomModel>];
 }
 
 export interface ServerToClientEvents {
-  [RoomEvents.EMIT_NEW_USER]: (doodler: DoodlerModel) => void;
-  [RoomEvents.EMIT_USER_LEAVE]: (doodler: Partial<DoodlerModel>) => void;
+  [RoomEvents.EMIT_DOODLER_JOIN]: (doodler: DoodlerModel) => void;
+  [RoomEvents.EMIT_DOODLER_LEAVE]: (doodler: Partial<DoodlerModel>) => void;
   [GameEvents.EMIT_GAME_START]: () => void;
   [GameEvents.EMIT_GAME_LOBBY]: () => void;
   [GameEvents.EMIT_GAME_END]: () => void;
 }
 
 export interface ClientToServerEvents {
-  [DoodlerEvents.ON_GET]: (
-    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_GET]
+  [DoodlerEvents.ON_GET_DOODLER]: (
+    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_GET_DOODLER]
   ) => void;
-  [DoodlerEvents.ON_SET]: (
-    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_SET]
+  [DoodlerEvents.ON_SET_DOODLER]: (
+    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_SET_DOODLER]
   ) => void;
-  [GameEvents.ON_PLAY_PUBLIC_GAME]: (
-    ...args: ClientToServerEventsArguments[GameEvents.ON_PLAY_PUBLIC_GAME]
+  [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: (
+    ...args: ClientToServerEventsArguments[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]
   ) => void;
   [GameEvents.ON_GET_GAME_DETAILS]: (
     ...args: ClientToServerEventsArguments[GameEvents.ON_GET_GAME_DETAILS]

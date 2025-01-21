@@ -4,6 +4,7 @@ import { IoType, SocketType } from '@/types/socket';
 import {
   DoodlerEvents,
   GameEvents,
+  RoomEvents,
   SocketEvents
 } from '../types/socket/events';
 
@@ -26,6 +27,7 @@ class SocketService implements SocketServiceInterface {
       this.registerSocketEvents(socket);
       this.registerDoodlerEvents(socket);
       this.registerRoomEvents(socket);
+      this.registerGameEvents(socket);
     });
   }
 
@@ -50,8 +52,14 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerDoodlerEvents(socket: SocketType) {
-    socket.on(DoodlerEvents.ON_GET, this.socketController.handleDoodlerOnGet);
-    socket.on(DoodlerEvents.ON_SET, this.socketController.handleDoodlerOnSet);
+    socket.on(
+      DoodlerEvents.ON_GET_DOODLER,
+      this.socketController.handleDoodlerOnGet
+    );
+    socket.on(
+      DoodlerEvents.ON_SET_DOODLER,
+      this.socketController.handleDoodlerOnSet
+    );
   }
 
   /**
@@ -60,9 +68,16 @@ class SocketService implements SocketServiceInterface {
    */
   private registerRoomEvents(socket: SocketType) {
     socket.on(
-      GameEvents.ON_PLAY_PUBLIC_GAME,
-      this.socketController.handleGameOnPlayPublicGame
+      RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM,
+      this.socketController.handleRoomOnAddDoodlerToPublicRoom
     );
+  }
+
+  /**
+   * Register Incoming Game Specific Events
+   * @param socket
+   */
+  private registerGameEvents(socket: SocketType) {
     socket.on(
       GameEvents.ON_GET_GAME_DETAILS,
       this.socketController.handleGameOnGetGameDetails

@@ -9,17 +9,17 @@ export enum SocketEvents {
 }
 
 export enum RoomEvents {
-  EMIT_NEW_USER = 'new-user',
-  EMIT_USER_LEAVE = 'user-leave'
+  ON_ADD_DOODLER_TO_PUBLIC_ROOM = 'add-doodler-to-public-room',
+  EMIT_DOODLER_JOIN = 'doodler-join',
+  EMIT_DOODLER_LEAVE = 'doodler-leave'
 }
 
 export enum DoodlerEvents {
-  ON_GET = 'get-user',
-  ON_SET = 'set-user'
+  ON_GET_DOODLER = 'get-doodler',
+  ON_SET_DOODLER = 'set-doodler'
 }
 
 export enum GameEvents {
-  ON_PLAY_PUBLIC_GAME = 'play-public-game',
   ON_GET_GAME_DETAILS = 'get-game-details',
   EMIT_GAME_START = 'game-start',
   EMIT_GAME_LOBBY = 'game-lobby',
