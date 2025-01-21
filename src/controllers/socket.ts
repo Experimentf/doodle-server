@@ -1,5 +1,5 @@
 import DoodlerServiceInstance from '@/services/doodler';
-import GameService from '@/services/game';
+import GameServiceInstance, { GameService } from '@/services/game';
 import RoomServiceInstance from '@/services/room';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
 import { DoodlerEvents, GameEvents, RoomEvents } from '@/types/socket/events';
@@ -14,6 +14,7 @@ interface SocketControllerInterface {
   handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER];
 
   handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM];
+  handleGameOnGetGameDetails: ClientToServerEvents[GameEvents.ON_GET_GAME_DETAILS];
 }
 
 class SocketController implements SocketControllerInterface {
@@ -129,20 +130,20 @@ class SocketController implements SocketControllerInterface {
    * @param respond
    */
   public handleGameOnGetGameDetails: ClientToServerEvents[GameEvents.ON_GET_GAME_DETAILS] =
-    () => {
-      // const room = rooms.get(roomId);
-      // if (!room) {
-      //   callback(null, new ErrorFromServer('Room not found'));
-      // }
-      // // Start the game if room is public and more than 1 doodler in the room
-      // if (
-      //   room &&
-      //   room.type === RoomMode.PUBLIC &&
-      //   room.getNumberOfDoodlers() > 1
-      // ) {
-      //   room.startGame();
-      // }
-      // callback(room?.getJSON());
+    (roomId, respond) => {
+      const { data: gameDetailsData, error: gameDetailsError } =
+        GameServiceInstance.getGameDetails(roomId);
+      if (gameDetailsError || gameDetailsData === undefined) {
+        respond(null, gameDetailsError);
+        return;
+      }
+      const { game } = gameDetailsData;
+      const { data: isValidGameData } = GameService.isValidGame(roomId);
+      // TODO: Check for room is public
+      if (isValidGameData) {
+        GameServiceInstance.startGame(roomId);
+      }
+      respond(game);
     };
 }
 

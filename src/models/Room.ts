@@ -1,5 +1,4 @@
 import { DEFAULT_CAPACITY } from '@/constants/game';
-import { GameStatus } from '@/types/game';
 import { generateId } from '@/utils/unique';
 
 import { DoodlerModel } from './Doodler';
@@ -13,7 +12,6 @@ export class RoomModel {
   // Private Variables
   private ownerId?: string;
   private capacity = DEFAULT_CAPACITY;
-  private status: GameStatus = GameStatus.LOBBY;
 
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision

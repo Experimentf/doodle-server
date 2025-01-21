@@ -1,15 +1,19 @@
 import { MINIMUM_VALID_SIZE } from '@/constants/game';
+import GameModel from '@/models/Game';
+import { GameInfoMapType } from '@/types/game';
+import { ServiceResponse } from '@/types/service';
+import { ErrorFromServer } from '@/utils/error';
 import { ErrorResponse, SuccessResponse } from '@/utils/service';
 
 import RoomServiceInstance from './room';
 
-class GameService {
-  // Private Variables
-  private roomId: string;
+interface GameServiceInterface {
+  getGameDetails: (roomId: string) => ServiceResponse<{ game: GameModel }>;
+  startGame: (roomId: string) => ServiceResponse<boolean>;
+}
 
-  constructor(roomId: string) {
-    this.roomId = roomId;
-  }
+export class GameService implements GameServiceInterface {
+  private gameDetailMap: GameInfoMapType = new Map<string, GameModel>();
 
   /**
    *
@@ -22,6 +26,42 @@ class GameService {
     const { room } = data;
     return SuccessResponse(room.currentSize >= MINIMUM_VALID_SIZE);
   }
+
+  /**
+   *
+   * @param roomId Room id for which game detail is needed
+   * @returns
+   */
+  public getGameDetails(roomId: string) {
+    const { data, error } = this.findGame(roomId);
+    if (error || data === undefined) return ErrorResponse(error);
+    return SuccessResponse({ game: data.game });
+  }
+
+  /**
+   *
+   * @param roomId Room for which game needs to be started
+   * @returns
+   */
+  public startGame(roomId: string) {
+    const { data, error } = this.findGame(roomId);
+    if (error || data === undefined) return ErrorResponse(error);
+    // TODO: Finish implementation
+    return SuccessResponse(true);
+  }
+
+  // PRIVATE METHODS
+  /**
+   * Finds a game for a room
+   * @param roomId RoomID whose game needs to be found
+   * @returns
+   */
+  private findGame(roomId: string) {
+    const game = this.gameDetailMap.get(roomId);
+    if (!game) return ErrorResponse(new ErrorFromServer());
+    return SuccessResponse({ game });
+  }
 }
 
-export default GameService;
+const GameServiceInstance = new GameService();
+export default GameServiceInstance;

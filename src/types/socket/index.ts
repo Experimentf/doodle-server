@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 
 import { DoodlerModel } from '@/models/Doodler';
-import { RoomModel } from '@/models/Room';
+import GameModel from '@/models/Game';
 import { ErrorFromServer } from '@/utils/error';
 
 import { DoodlerEvents, GameEvents, RoomEvents } from './events';
@@ -14,7 +14,7 @@ interface ClientToServerEventsArguments {
   [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: [
     RespondFunction<{ roomId: string }>
   ];
-  [GameEvents.ON_GET_GAME_DETAILS]: [string, RespondFunction<RoomModel>];
+  [GameEvents.ON_GET_GAME_DETAILS]: [string, RespondFunction<GameModel>];
 }
 
 export interface ServerToClientEvents {
