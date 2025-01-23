@@ -25,20 +25,11 @@ export interface ServerToClientEvents {
   [GameEvents.EMIT_GAME_END]: () => void;
 }
 
-export interface ClientToServerEvents {
-  [DoodlerEvents.ON_GET_DOODLER]: (
-    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_GET_DOODLER]
+export type ClientToServerEvents = {
+  [Key in keyof ClientToServerEventsArguments]: (
+    ...args: ClientToServerEventsArguments[Key]
   ) => void;
-  [DoodlerEvents.ON_SET_DOODLER]: (
-    ...args: ClientToServerEventsArguments[DoodlerEvents.ON_SET_DOODLER]
-  ) => void;
-  [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: (
-    ...args: ClientToServerEventsArguments[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]
-  ) => void;
-  [GameEvents.ON_GET_GAME_DETAILS]: (
-    ...args: ClientToServerEventsArguments[GameEvents.ON_GET_GAME_DETAILS]
-  ) => void;
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface InterServerEvents {}

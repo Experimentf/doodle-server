@@ -8,10 +8,10 @@ export class RoomModel {
   public readonly id: string;
   public readonly doodlers = new Array<DoodlerModel>();
   public readonly isPrivate: boolean;
+  public readonly capacity = DEFAULT_CAPACITY;
 
   // Private Variables
   private ownerId?: string;
-  private capacity = DEFAULT_CAPACITY;
 
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
