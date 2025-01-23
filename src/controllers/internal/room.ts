@@ -1,7 +1,7 @@
+import { RoomEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/doodler';
 import RoomServiceInstance from '@/services/room';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
-import { RoomEvents } from '@/types/socket/events';
 
 import { RoomControllerInterface } from './types';
 

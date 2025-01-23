@@ -4,7 +4,7 @@ import { DoodlerModel } from '@/models/Doodler';
 import GameModel from '@/models/Game';
 import { ErrorFromServer } from '@/utils/error';
 
-import { DoodlerEvents, GameEvents, RoomEvents } from './events';
+import { DoodlerEvents, GameEvents, RoomEvents } from '../constants/events';
 
 type RespondFunction<T> = (data?: T | null, error?: ErrorFromServer) => void;
 

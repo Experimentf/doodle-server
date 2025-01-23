@@ -1,5 +1,5 @@
+import { DoodlerEvents, GameEvents, RoomEvents } from '@/constants/events';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
-import { DoodlerEvents, GameEvents, RoomEvents } from '@/types/socket/events';
 
 export interface SetSocketInterface {
   setSocket: (socket: SocketType) => void;

@@ -6,7 +6,7 @@ import {
   GameEvents,
   RoomEvents,
   SocketEvents
-} from '../types/socket/events';
+} from '../constants/events';
 
 interface SocketServiceInterface {
   start: (io: IoType) => void;

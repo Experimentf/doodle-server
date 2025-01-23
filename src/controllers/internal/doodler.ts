@@ -1,6 +1,6 @@
+import { DoodlerEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/doodler';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
-import { DoodlerEvents } from '@/types/socket/events';
 
 import { DoodlerControllerInterface } from './types';
 

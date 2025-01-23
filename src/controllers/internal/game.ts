@@ -1,6 +1,6 @@
+import { GameEvents } from '@/constants/events';
 import GameServiceInstance, { GameService } from '@/services/game';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
-import { GameEvents } from '@/types/socket/events';
 
 import { GameControllerInterface } from './types';
 
