@@ -8,7 +8,7 @@ import { DoodlerEvents, GameEvents, RoomEvents } from './events';
 
 type RespondFunction<T> = (data?: T | null, error?: ErrorFromServer) => void;
 
-interface ClientToServerEventsArguments {
+interface ClientToServerEventsArgumentMap {
   [DoodlerEvents.ON_GET_DOODLER]: [RespondFunction<Partial<DoodlerModel>>];
   [DoodlerEvents.ON_SET_DOODLER]: [{ name: string; avatar: object }];
   [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: [
@@ -26,8 +26,8 @@ export interface ServerToClientEvents {
 }
 
 export type ClientToServerEvents = {
-  [Key in keyof ClientToServerEventsArguments]: (
-    ...args: ClientToServerEventsArguments[Key]
+  [Key in keyof ClientToServerEventsArgumentMap]: (
+    ...args: ClientToServerEventsArgumentMap[Key]
   ) => void;
 };
 

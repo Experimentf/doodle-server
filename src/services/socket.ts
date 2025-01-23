@@ -1,4 +1,4 @@
-import SocketController from '@/controllers/socket';
+import Controller, { ControllerInterface } from '@/controllers';
 import { IoType, SocketType } from '@/types/socket';
 
 import {
@@ -14,7 +14,7 @@ interface SocketServiceInterface {
 
 class SocketService implements SocketServiceInterface {
   private io?: IoType;
-  private socketController = new SocketController();
+  private controller = new Controller() as unknown as ControllerInterface;
 
   /**
    * Register Incoming Connections on IO
@@ -23,7 +23,7 @@ class SocketService implements SocketServiceInterface {
     this.io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
-      this.socketController.setSocket(socket);
+      this.controller.setSocket(socket);
       this.registerSocketEvents(socket);
       this.registerDoodlerEvents(socket);
       this.registerRoomEvents(socket);
@@ -39,11 +39,11 @@ class SocketService implements SocketServiceInterface {
   private registerSocketEvents(socket: SocketType) {
     socket.on(
       SocketEvents.ON_DISCONNECTING,
-      this.socketController.handleSocketOnDisconnecting
+      this.controller.handleSocketOnDisconnecting
     );
     socket.on(
       SocketEvents.ON_DISCONNECT,
-      this.socketController.handleSocketOnDisconnect
+      this.controller.handleSocketOnDisconnect
     );
   }
 
@@ -52,14 +52,8 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerDoodlerEvents(socket: SocketType) {
-    socket.on(
-      DoodlerEvents.ON_GET_DOODLER,
-      this.socketController.handleDoodlerOnGet
-    );
-    socket.on(
-      DoodlerEvents.ON_SET_DOODLER,
-      this.socketController.handleDoodlerOnSet
-    );
+    socket.on(DoodlerEvents.ON_GET_DOODLER, this.controller.handleDoodlerOnGet);
+    socket.on(DoodlerEvents.ON_SET_DOODLER, this.controller.handleDoodlerOnSet);
   }
 
   /**
@@ -69,7 +63,7 @@ class SocketService implements SocketServiceInterface {
   private registerRoomEvents(socket: SocketType) {
     socket.on(
       RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM,
-      this.socketController.handleRoomOnAddDoodlerToPublicRoom
+      this.controller.handleRoomOnAddDoodlerToPublicRoom
     );
   }
 
@@ -80,7 +74,7 @@ class SocketService implements SocketServiceInterface {
   private registerGameEvents(socket: SocketType) {
     socket.on(
       GameEvents.ON_GET_GAME_DETAILS,
-      this.socketController.handleGameOnGetGameDetails
+      this.controller.handleGameOnGetGameDetails
     );
   }
 }
