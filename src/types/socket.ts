@@ -10,7 +10,10 @@ type RespondFunction<T> = (data?: T | null, error?: ErrorFromServer) => void;
 
 interface ClientToServerEventsArgumentMap {
   [DoodlerEvents.ON_GET_DOODLER]: [RespondFunction<Partial<DoodlerModel>>];
-  [DoodlerEvents.ON_SET_DOODLER]: [{ name: string; avatar: object }];
+  [DoodlerEvents.ON_SET_DOODLER]: [
+    { name: string; avatar: object },
+    RespondFunction<DoodlerModel>
+  ];
   [RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]: [
     RespondFunction<{ roomId: string }>
   ];
