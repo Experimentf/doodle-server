@@ -25,7 +25,7 @@ class GameController implements GameControllerInterface {
       const { data: gameDetailsData, error: gameDetailsError } =
         GameServiceInstance.getGameDetails(roomId);
       if (gameDetailsError || gameDetailsData === undefined) {
-        respond(null, gameDetailsError);
+        respond({ data: null, error: gameDetailsError });
         return;
       }
       const { game } = gameDetailsData;
@@ -34,7 +34,7 @@ class GameController implements GameControllerInterface {
       if (isValidGameData) {
         GameServiceInstance.startGame(roomId);
       }
-      respond(game);
+      respond({ data: game.json });
     };
 }
 

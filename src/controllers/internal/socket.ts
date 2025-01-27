@@ -28,8 +28,11 @@ class SocketController implements SocketControllerInterface {
       const doodlerId = socket.id;
       RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId); // TODO: Handle Error
       socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
-        id: doodlerId,
-        name: socket.data.name
+        doodler: {
+          id: doodlerId,
+          name: socket.data.name,
+          avatar: socket.data.avatar
+        }
       });
       const { data: isValidGame } = GameService.isValidGame(roomId); // TODO: Handle Error
       if (!isValidGame) {

@@ -20,6 +20,17 @@ export class RoomModel {
     this.setOwner(ownerId);
   }
 
+  public get json() {
+    return {
+      id: this.id,
+      capacity: this.capacity,
+      isPrivate: this.isPrivate,
+      doodlers: this.doodlers,
+      ownerId: this.ownerId,
+      gameId: this.gameId
+    };
+  }
+
   // Returns the current number of members
   public get currentSize() {
     return this.doodlers.length;

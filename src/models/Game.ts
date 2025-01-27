@@ -1,7 +1,9 @@
 import { DEFAULT_MAX_ROUNDS, DEFAULT_MAX_TIME } from '@/constants/game';
 import { GameOptions, GameStatus } from '@/types/game';
+import { generateId } from '@/utils/unique';
 
 class GameModel {
+  public readonly id: string;
   private status: GameStatus = GameStatus.LOBBY;
   private options: GameOptions = {
     round: { current: 1, max: DEFAULT_MAX_ROUNDS },
@@ -9,7 +11,17 @@ class GameModel {
     word: ''
   };
 
-  constructor() {}
+  constructor() {
+    this.id = generateId();
+  }
+
+  public get json() {
+    return {
+      id: this.id,
+      status: this.status,
+      options: this.options
+    };
+  }
 }
 
 export default GameModel;

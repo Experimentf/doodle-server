@@ -21,20 +21,20 @@ class RoomController implements RoomControllerInterface {
    * @param respond - Respond to the client
    */
   public handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM] =
-    (respond) => {
+    (_, respond) => {
       if (!this.socket) return;
       const socket = this.socket;
       const { data: doodlerData, error: findDoodlerError } =
         DoodlerServiceInstance.findDooder(socket.id);
       if (findDoodlerError || doodlerData === undefined) {
-        respond(null, findDoodlerError);
+        respond({ data: null, error: findDoodlerError });
         return;
       }
       const { doodler } = doodlerData;
       const { data: roomAssignmentData, error: roomAssignmentError } =
         RoomServiceInstance.assignDoodlerToPublicRoom(doodler);
       if (roomAssignmentError || roomAssignmentData === undefined) {
-        respond(null, roomAssignmentError);
+        respond({ data: null, error: roomAssignmentError });
         return;
       }
       const { roomId } = roomAssignmentData;
@@ -43,9 +43,9 @@ class RoomController implements RoomControllerInterface {
       socket.join(roomId);
 
       // Let other users in the room know
-      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, doodler);
+      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler });
 
-      respond({ roomId });
+      respond({ data: { roomId } });
     };
 }
 

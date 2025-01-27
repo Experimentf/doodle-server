@@ -21,18 +21,18 @@ class DoodlerController implements DoodlerControllerInterface {
    * @returns
    */
   public handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER] =
-    (respond) => {
+    (_, respond) => {
       if (!this.socket) return;
       const socket = this.socket;
       const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
       if (error || !data) {
-        respond(null, error);
+        respond({ data: null, error });
         return;
       }
       const {
         doodler: { name }
       } = data;
-      respond({ name });
+      respond({ data: { name } });
     };
 
   /**
