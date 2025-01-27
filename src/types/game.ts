@@ -2,14 +2,22 @@ import GameModel from '@/models/Game';
 import { RoomModel } from '@/models/Room';
 
 export enum GameStatus {
-  GAME = 'game',
-  LOBBY = 'lobby',
-  END = 'end'
+  GAME = 'in_game',
+  LOBBY = 'in_lobby',
+  END = 'in_end',
+  RESULT = 'in_result'
 }
 
-export enum RoomMode {
-  PUBLIC = 'public',
-  PRIVATE = 'private'
+export interface GameOptions {
+  time: {
+    current: number;
+    max: number;
+  };
+  round: {
+    current: number;
+    max: number;
+  };
+  word: string;
 }
 
 export type RoomInfoMapType = Map<string, RoomModel>;

@@ -12,14 +12,13 @@ export class RoomModel {
 
   // Private Variables
   private ownerId?: string;
+  private gameId?: string;
 
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
     this.isPrivate = ownerId !== undefined;
     this.setOwner(ownerId);
   }
-
-  // Public Methods
 
   // Returns the current number of members
   public get currentSize() {
