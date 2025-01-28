@@ -72,10 +72,7 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerGameEvents(socket: SocketType) {
-    socket.on(
-      GameEvents.ON_GET_GAME_DETAILS,
-      this.controller.handleGameOnGetGameDetails
-    );
+    socket.on(GameEvents.ON_GET_GAME, this.controller.handleGameOnGetGame);
   }
 }
 

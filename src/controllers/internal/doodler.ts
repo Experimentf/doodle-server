@@ -30,9 +30,9 @@ class DoodlerController implements DoodlerControllerInterface {
         return;
       }
       const {
-        doodler: { name }
+        doodler: { id }
       } = data;
-      respond({ data: { name } });
+      respond({ data: { id } });
     };
 
   /**

@@ -6,10 +6,7 @@ import { ClientToServerEventsArgument } from './helper';
 export type GameInterface = GameModel['json'];
 
 export interface GameClientToServerEventsArgumentMap {
-  [GameEvents.ON_GET_GAME_DETAILS]: ClientToServerEventsArgument<
-    string,
-    GameInterface
-  >;
+  [GameEvents.ON_GET_GAME]: ClientToServerEventsArgument<string, GameInterface>;
 }
 
 export interface GameServerToClientEvents {

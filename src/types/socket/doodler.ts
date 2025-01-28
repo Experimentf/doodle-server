@@ -8,7 +8,7 @@ export type DoodlerInterface = DoodlerModel['json'];
 export interface DoodlerClientToServerEventsArgumentMap {
   [DoodlerEvents.ON_GET_DOODLER]: ClientToServerEventsArgument<
     undefined,
-    Pick<DoodlerInterface, 'name'>
+    Pick<DoodlerInterface, 'id'>
   >;
   [DoodlerEvents.ON_SET_DOODLER]: ClientToServerEventsArgument<
     Pick<DoodlerInterface, 'name' | 'avatar'>,

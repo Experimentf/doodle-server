@@ -12,6 +12,7 @@ export enum RoomEvents {
   ON_ADD_DOODLER_TO_PUBLIC_ROOM = 'add-doodler-to-public-room',
   ON_ADD_DOODLER_TO_PRIVATE_ROOM = 'add-doodler-to-private-room',
   ON_CREATE_PRIVATE_ROOM = 'create-private-room',
+  ON_GET_ROOM = 'get-room',
   EMIT_DOODLER_JOIN = 'doodler-join',
   EMIT_DOODLER_LEAVE = 'doodler-leave'
 }
@@ -22,7 +23,7 @@ export enum DoodlerEvents {
 }
 
 export enum GameEvents {
-  ON_GET_GAME_DETAILS = 'get-game-details',
+  ON_GET_GAME = 'get-game',
   EMIT_GAME_START = 'game-start',
   EMIT_GAME_LOBBY = 'game-lobby',
   EMIT_GAME_END = 'game-end'

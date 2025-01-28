@@ -1,5 +1,5 @@
 import { GameEvents } from '@/constants/events';
-import GameServiceInstance, { GameService } from '@/services/game';
+import GameServiceInstance from '@/services/game';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
 
 import { GameControllerInterface } from './types';
@@ -20,22 +20,24 @@ class GameController implements GameControllerInterface {
    * @param roomId
    * @param respond
    */
-  public handleGameOnGetGameDetails: ClientToServerEvents[GameEvents.ON_GET_GAME_DETAILS] =
-    (roomId, respond) => {
-      const { data: gameDetailsData, error: gameDetailsError } =
-        GameServiceInstance.getGameDetails(roomId);
-      if (gameDetailsError || gameDetailsData === undefined) {
-        respond({ data: null, error: gameDetailsError });
-        return;
-      }
-      const { game } = gameDetailsData;
-      const { data: isValidGameData } = GameService.isValidGame(roomId);
-      // TODO: Check for room is public
-      if (isValidGameData) {
-        GameServiceInstance.startGame(roomId);
-      }
-      respond({ data: game.json });
-    };
+  public handleGameOnGetGame: ClientToServerEvents[GameEvents.ON_GET_GAME] = (
+    gameId,
+    respond
+  ) => {
+    const { data: gameDetailsData, error: gameDetailsError } =
+      GameServiceInstance.findGame(gameId);
+    if (gameDetailsError || !gameDetailsData) {
+      respond({ error: gameDetailsError });
+      return;
+    }
+    const { game } = gameDetailsData;
+    // const { data: isValidGameData } = GameService.isValidGame(roomId);
+    // // TODO: Check for room is public
+    // if (isValidGameData) {
+    //   GameServiceInstance.startGame(roomId);
+    // }
+    respond({ data: game.json });
+  };
 }
 
 export default GameController;

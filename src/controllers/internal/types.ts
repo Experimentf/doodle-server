@@ -11,7 +11,7 @@ export interface DoodlerControllerInterface extends SetSocketInterface {
 }
 
 export interface GameControllerInterface extends SetSocketInterface {
-  handleGameOnGetGameDetails: ClientToServerEvents[GameEvents.ON_GET_GAME_DETAILS];
+  handleGameOnGetGame: ClientToServerEvents[GameEvents.ON_GET_GAME];
 }
 
 export interface RoomControllerInterface extends SetSocketInterface {

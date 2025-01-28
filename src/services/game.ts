@@ -8,8 +8,9 @@ import { ErrorResponse, SuccessResponse } from '@/utils/service';
 import RoomServiceInstance from './room';
 
 interface GameServiceInterface {
-  getGameDetails: (roomId: string) => ServiceResponse<{ game: GameModel }>;
+  findGame: (roomId: string) => ServiceResponse<{ game: GameModel }>;
   startGame: (roomId: string) => ServiceResponse<boolean>;
+  createGame: (roomId: string) => ServiceResponse<{ game: GameModel }>;
 }
 
 export class GameService implements GameServiceInterface {
@@ -29,35 +30,35 @@ export class GameService implements GameServiceInterface {
 
   /**
    *
-   * @param roomId Room id for which game detail is needed
+   * @param gameId Game ID for which game needs to be started
    * @returns
    */
-  public getGameDetails(roomId: string) {
-    const { data, error } = this.findGame(roomId);
-    if (error || data === undefined) return ErrorResponse(error);
-    return SuccessResponse({ game: data.game });
-  }
-
-  /**
-   *
-   * @param roomId Room for which game needs to be started
-   * @returns
-   */
-  public startGame(roomId: string) {
-    const { data, error } = this.findGame(roomId);
+  public startGame(gameId: string) {
+    const { data, error } = this.findGame(gameId);
     if (error || data === undefined) return ErrorResponse(error);
     // TODO: Finish implementation
     return SuccessResponse(true);
   }
 
-  // PRIVATE METHODS
+  /**
+   *
+   * @returns id - New game's id
+   */
+  public createGame() {
+    const newGame = new GameModel();
+    this.gameDetailMap.set(newGame.id, newGame);
+    const { data, error } = this.findGame(newGame.id);
+    if (error || data === undefined) return ErrorResponse(error);
+    return SuccessResponse({ game: data.game });
+  }
+
   /**
    * Finds a game for a room
-   * @param roomId RoomID whose game needs to be found
+   * @param gameId Game ID whose game needs to be found
    * @returns
    */
-  private findGame(roomId: string) {
-    const game = this.gameDetailMap.get(roomId);
+  public findGame(gameId: string) {
+    const game = this.gameDetailMap.get(gameId);
     if (!game) return ErrorResponse(new ErrorFromServer());
     return SuccessResponse({ game });
   }
