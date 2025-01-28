@@ -41,10 +41,17 @@ class DoodlerController implements DoodlerControllerInterface {
    * @returns
    */
   public handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER] =
-    (doodler) => {
+    (doodler, respond) => {
       if (!this.socket) return;
       const socket = this.socket;
-      DoodlerServiceInstance.addDoodler({ id: socket.id, ...doodler }); // TODO: Handle Error
+      const { data, error } = DoodlerServiceInstance.addDoodler({
+        id: socket.id,
+        ...doodler
+      });
+      if (error || data === undefined) {
+        respond({ data: null, error: error });
+      }
+      respond({ data: { id: data.doodlerId } });
     };
 }
 

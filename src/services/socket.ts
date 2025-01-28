@@ -23,7 +23,7 @@ class SocketService implements SocketServiceInterface {
     this.io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
-      this.controller.setSocket(socket);
+      this.controller.setControllerSocket(socket);
       this.registerSocketEvents(socket);
       this.registerDoodlerEvents(socket);
       this.registerRoomEvents(socket);
