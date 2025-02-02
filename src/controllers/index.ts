@@ -1,5 +1,3 @@
-import { SocketType } from '@/types/socket';
-
 import DoodlerController from './internal/doodler';
 import GameController from './internal/game';
 import RoomController from './internal/room';
@@ -14,10 +12,7 @@ import {
 export type ControllerInterface = SocketControllerInterface &
   DoodlerControllerInterface &
   RoomControllerInterface &
-  GameControllerInterface & {
-    setControllerSocket: (socket: SocketType) => void;
-  };
-
+  GameControllerInterface;
 /**
  * A delegator controller that delegates the control to sub-controllers
  * depending on the accessed handler
@@ -39,19 +34,17 @@ class Controller {
           this.gameController
         ]) {
           if (prop in ctrl) {
-            return ctrl[prop as keyof typeof ctrl].bind(ctrl);
+            const property = ctrl[prop as keyof typeof ctrl];
+            if (typeof property === 'function')
+              return (
+                property as ControllerInterface[keyof ControllerInterface]
+              ).bind(ctrl);
+            return property;
           }
         }
         return undefined;
       }
     }) as unknown as Controller & ControllerInterface;
-  }
-
-  public setControllerSocket(socket: SocketType) {
-    this.socketController.setSocket(socket);
-    this.doodlerController.setSocket(socket);
-    this.roomController.setSocket(socket);
-    this.gameController.setSocket(socket);
   }
 }
 

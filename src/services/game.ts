@@ -14,7 +14,7 @@ interface GameServiceInterface {
 }
 
 export class GameService implements GameServiceInterface {
-  private gameDetailMap: GameInfoMapType = new Map<string, GameModel>();
+  public gameDetailMap: GameInfoMapType = new Map<string, GameModel>();
 
   /**
    *

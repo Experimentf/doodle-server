@@ -1,31 +1,22 @@
-import { GameEvents } from '@/constants/events';
 import GameServiceInstance from '@/services/game';
-import { ClientToServerEvents, SocketType } from '@/types/socket';
 
 import { GameControllerInterface } from './types';
 
 class GameController implements GameControllerInterface {
-  private socket?: SocketType;
-
-  /**
-   * Set the socket variable
-   * @param socket
-   */
-  public setSocket(socket: SocketType) {
-    this.socket = socket;
-  }
-
   /**
    * Handle when the client requests the game details
    * @param roomId
    * @param respond
    */
-  public handleGameOnGetGame: ClientToServerEvents[GameEvents.ON_GET_GAME] = (
-    gameId,
+  public handleGameOnGetGame: GameControllerInterface['handleGameOnGetGame'] = (
+    _socket,
+    payload,
     respond
   ) => {
+    const gameId = payload;
     const { data: gameDetailsData, error: gameDetailsError } =
       GameServiceInstance.findGame(gameId);
+    console.log(GameServiceInstance.gameDetailMap);
     if (gameDetailsError || !gameDetailsData) {
       respond({ error: gameDetailsError });
       return;
@@ -36,6 +27,7 @@ class GameController implements GameControllerInterface {
     // if (isValidGameData) {
     //   GameServiceInstance.startGame(roomId);
     // }
+
     respond({ data: game.json });
   };
 }

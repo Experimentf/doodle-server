@@ -1,29 +1,16 @@
 import { RoomEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/doodler';
 import RoomServiceInstance from '@/services/room';
-import { ClientToServerEvents, SocketType } from '@/types/socket';
 
 import { RoomControllerInterface } from './types';
 
 class RoomController implements RoomControllerInterface {
-  private socket?: SocketType;
-
-  /**
-   * Set the socket variable
-   * @param socket
-   */
-  public setSocket(socket: SocketType) {
-    this.socket = socket;
-  }
-
   /**
    * Handle when the client wants to play a public game
    * @param respond - Respond to the client
    */
-  public handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM] =
-    (_, respond) => {
-      if (!this.socket) return;
-      const socket = this.socket;
+  public handleRoomOnAddDoodlerToPublicRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPublicRoom'] =
+    (socket, _payload, respond) => {
       const { data: doodlerData, error: findDoodlerError } =
         DoodlerServiceInstance.findDooder(socket.id);
       if (findDoodlerError || doodlerData === undefined) {

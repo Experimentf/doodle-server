@@ -1,29 +1,15 @@
-import { DoodlerEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/doodler';
-import { ClientToServerEvents, SocketType } from '@/types/socket';
 
 import { DoodlerControllerInterface } from './types';
 
 class DoodlerController implements DoodlerControllerInterface {
-  private socket?: SocketType;
-
-  /**
-   * Set the socket variable
-   * @param socket
-   */
-  public setSocket(socket: SocketType) {
-    this.socket = socket;
-  }
-
   /**
    * Handle when the user request their info
    * @param respond - Respond to the client
    * @returns
    */
-  public handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER] =
-    (_, respond) => {
-      if (!this.socket) return;
-      const socket = this.socket;
+  public handleDoodlerOnGet: DoodlerControllerInterface['handleDoodlerOnGet'] =
+    (socket, _payload, respond) => {
       const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
       if (error || !data) {
         respond({ data: null, error });
@@ -40,10 +26,9 @@ class DoodlerController implements DoodlerControllerInterface {
    * @param doodler - Doodler information provided by the client
    * @returns
    */
-  public handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER] =
-    (doodler, respond) => {
-      if (!this.socket) return;
-      const socket = this.socket;
+  public handleDoodlerOnSet: DoodlerControllerInterface['handleDoodlerOnSet'] =
+    (socket, payload, respond) => {
+      const doodler = payload;
       const { data, error } = DoodlerServiceInstance.addDoodler({
         id: socket.id,
         ...doodler

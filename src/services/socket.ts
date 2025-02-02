@@ -23,7 +23,6 @@ class SocketService implements SocketServiceInterface {
     this.io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
-      this.controller.setControllerSocket(socket);
       this.registerSocketEvents(socket);
       this.registerDoodlerEvents(socket);
       this.registerRoomEvents(socket);
@@ -37,13 +36,11 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerSocketEvents(socket: SocketType) {
-    socket.on(
-      SocketEvents.ON_DISCONNECTING,
-      this.controller.handleSocketOnDisconnecting
+    socket.on(SocketEvents.ON_DISCONNECTING, () =>
+      this.controller.handleSocketOnDisconnecting(socket)
     );
-    socket.on(
-      SocketEvents.ON_DISCONNECT,
-      this.controller.handleSocketOnDisconnect
+    socket.on(SocketEvents.ON_DISCONNECT, () =>
+      this.controller.handleSocketOnDisconnect(socket)
     );
   }
 
@@ -52,8 +49,12 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerDoodlerEvents(socket: SocketType) {
-    socket.on(DoodlerEvents.ON_GET_DOODLER, this.controller.handleDoodlerOnGet);
-    socket.on(DoodlerEvents.ON_SET_DOODLER, this.controller.handleDoodlerOnSet);
+    socket.on(DoodlerEvents.ON_GET_DOODLER, (...args) =>
+      this.controller.handleDoodlerOnGet(socket, ...args)
+    );
+    socket.on(DoodlerEvents.ON_SET_DOODLER, (...args) =>
+      this.controller.handleDoodlerOnSet(socket, ...args)
+    );
   }
 
   /**
@@ -61,9 +62,8 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerRoomEvents(socket: SocketType) {
-    socket.on(
-      RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM,
-      this.controller.handleRoomOnAddDoodlerToPublicRoom
+    socket.on(RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM, (...args) =>
+      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket, ...args)
     );
   }
 
@@ -72,7 +72,9 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerGameEvents(socket: SocketType) {
-    socket.on(GameEvents.ON_GET_GAME, this.controller.handleGameOnGetGame);
+    socket.on(GameEvents.ON_GET_GAME, (...args) =>
+      this.controller.handleGameOnGetGame(socket, ...args)
+    );
   }
 }
 

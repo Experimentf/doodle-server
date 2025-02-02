@@ -1,24 +1,34 @@
 import { DoodlerEvents, GameEvents, RoomEvents } from '@/constants/events';
 import { ClientToServerEvents, SocketType } from '@/types/socket';
 
-export interface SetSocketInterface {
-  setSocket: (socket: SocketType) => void;
+export interface DoodlerControllerInterface {
+  handleDoodlerOnGet: (
+    socket: SocketType,
+    ...args: Parameters<ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER]>
+  ) => void;
+  handleDoodlerOnSet: (
+    socket: SocketType,
+    ...args: Parameters<ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER]>
+  ) => void;
 }
 
-export interface DoodlerControllerInterface extends SetSocketInterface {
-  handleDoodlerOnGet: ClientToServerEvents[DoodlerEvents.ON_GET_DOODLER];
-  handleDoodlerOnSet: ClientToServerEvents[DoodlerEvents.ON_SET_DOODLER];
+export interface GameControllerInterface {
+  handleGameOnGetGame: (
+    socket: SocketType,
+    ...args: Parameters<ClientToServerEvents[GameEvents.ON_GET_GAME]>
+  ) => void;
 }
 
-export interface GameControllerInterface extends SetSocketInterface {
-  handleGameOnGetGame: ClientToServerEvents[GameEvents.ON_GET_GAME];
+export interface RoomControllerInterface {
+  handleRoomOnAddDoodlerToPublicRoom: (
+    socket: SocketType,
+    ...args: Parameters<
+      ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM]
+    >
+  ) => void;
 }
 
-export interface RoomControllerInterface extends SetSocketInterface {
-  handleRoomOnAddDoodlerToPublicRoom: ClientToServerEvents[RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM];
-}
-
-export interface SocketControllerInterface extends SetSocketInterface {
-  handleSocketOnDisconnecting: () => void;
-  handleSocketOnDisconnect: () => void;
+export interface SocketControllerInterface {
+  handleSocketOnDisconnecting: (socket: SocketType) => void;
+  handleSocketOnDisconnect: (socket: SocketType) => void;
 }
