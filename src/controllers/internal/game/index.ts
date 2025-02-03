@@ -1,6 +1,6 @@
 import GameServiceInstance from '@/services/game';
 
-import { GameControllerInterface } from './types';
+import { GameControllerInterface } from './interface';
 
 class GameController implements GameControllerInterface {
   /**
@@ -28,7 +28,7 @@ class GameController implements GameControllerInterface {
     //   GameServiceInstance.startGame(roomId);
     // }
 
-    respond({ data: game.json });
+    respond({ data: { game: game.json } });
   };
 }
 

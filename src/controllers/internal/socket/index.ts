@@ -3,7 +3,7 @@ import DoodlerServiceInstance from '@/services/doodler';
 import { GameService } from '@/services/game';
 import RoomServiceInstance from '@/services/room';
 
-import { SocketControllerInterface } from './types';
+import { SocketControllerInterface } from './interface';
 
 class SocketController implements SocketControllerInterface {
   /**

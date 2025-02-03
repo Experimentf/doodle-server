@@ -1,18 +1,17 @@
 import DoodlerController from './internal/doodler';
+import { DoodlerControllerInterface } from './internal/doodler/interface';
 import GameController from './internal/game';
+import { GameControllerInterface } from './internal/game/interface';
 import RoomController from './internal/room';
+import { RoomControllerInterface } from './internal/room/interface';
 import SocketController from './internal/socket';
-import {
-  DoodlerControllerInterface,
-  GameControllerInterface,
-  RoomControllerInterface,
-  SocketControllerInterface
-} from './internal/types';
+import { SocketControllerInterface } from './internal/socket/interface';
 
 export type ControllerInterface = SocketControllerInterface &
   DoodlerControllerInterface &
   RoomControllerInterface &
   GameControllerInterface;
+
 /**
  * A delegator controller that delegates the control to sub-controllers
  * depending on the accessed handler

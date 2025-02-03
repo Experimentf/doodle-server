@@ -2,7 +2,7 @@ import { RoomEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/doodler';
 import RoomServiceInstance from '@/services/room';
 
-import { RoomControllerInterface } from './types';
+import { RoomControllerInterface } from './interface';
 
 class RoomController implements RoomControllerInterface {
   /**

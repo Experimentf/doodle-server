@@ -1,6 +1,6 @@
 import DoodlerServiceInstance from '@/services/doodler';
 
-import { DoodlerControllerInterface } from './types';
+import { DoodlerControllerInterface } from './interface';
 
 class DoodlerController implements DoodlerControllerInterface {
   /**
