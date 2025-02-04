@@ -6,7 +6,7 @@ import { DoodlerModel } from './Doodler';
 export class RoomModel {
   // Public Variables
   public readonly id: string;
-  public readonly doodlers = new Array<DoodlerModel>();
+  public readonly doodlers = new Array<DoodlerModel['id']>();
   public readonly isPrivate: boolean;
   public readonly capacity = DEFAULT_CAPACITY;
 
@@ -42,15 +42,15 @@ export class RoomModel {
   }
 
   // Add a new doodler to the room
-  public addDoodler(doodler: DoodlerModel) {
+  public addDoodler(doodlerId: string) {
     if (this.doodlers.length === this.capacity) return false;
-    this.doodlers.push(doodler);
+    this.doodlers.push(doodlerId);
     return true;
   }
 
   // Remove a doodler from the room
   public removeDoodler(doodlerId: string) {
-    const index = this.doodlers.findIndex(({ id }) => id === doodlerId);
+    const index = this.doodlers.findIndex((id) => id === doodlerId);
     if (index === -1) return false;
     this.doodlers.splice(index, 1);
     return true;
@@ -58,11 +58,11 @@ export class RoomModel {
 
   // Find a doodler in the room
   public findDoodler(doodlerId: string) {
-    return this.doodlers.find(({ id }) => id === doodlerId);
+    return this.doodlers.find((id) => id === doodlerId);
   }
 
   // Get a random doodler
-  public get randomDoodler() {
+  public get randomDoodlerId() {
     const index = Math.round(Math.random() * (this.currentSize - 1));
     return this.doodlers[index];
   }

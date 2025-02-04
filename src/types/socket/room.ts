@@ -21,7 +21,7 @@ export interface RoomClientToServerEventsArgumentMap {
   >;
   [RoomEvents.ON_GET_ROOM]: ClientToServerEventsArgument<
     string,
-    { room: RoomInterface }
+    { room: RoomInterface; doodlers: DoodlerInterface[] }
   >;
 }
 

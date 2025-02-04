@@ -15,10 +15,8 @@ class DoodlerController implements DoodlerControllerInterface {
         respond({ data: null, error });
         return;
       }
-      const {
-        doodler: { id }
-      } = data;
-      respond({ data: { id } });
+      const { doodler } = data;
+      respond({ data: doodler });
     };
 
   /**

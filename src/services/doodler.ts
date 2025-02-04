@@ -11,6 +11,7 @@ interface DoodlerServiceInterface {
   }) => ServiceResponse<{ doodlerId: string }>;
   removeDoodler: (doodlerId: string) => ServiceResponse<boolean>;
   findDooder: (doodlerId: string) => ServiceResponse<{ doodler: DoodlerModel }>;
+  getDoodlers: (doodlerIds: string[]) => ServiceResponse<DoodlerModel[]>;
 }
 
 class DoodlerService implements DoodlerServiceInterface {
@@ -54,6 +55,25 @@ class DoodlerService implements DoodlerServiceInterface {
     if (!doodler)
       return ErrorResponse(new ErrorFromServer('Doodler not found!'));
     return SuccessResponse({ doodler });
+  }
+
+  /**
+   * Get all doodlers by doodler ids
+   * @param doodlerIds Doodler IDs for which doodlers are requested
+   * @returns - Array of Doodlers
+   */
+  public getDoodlers(doodlerIds: string[]) {
+    const resultLength = doodlerIds.length;
+    const doodlers = [];
+    for (let i = 0; i < resultLength; i++) {
+      const id = doodlerIds[i];
+      const { data, error } = this.findDooder(id);
+      if (error || data === undefined) break;
+      doodlers.push(data.doodler);
+    }
+    if (doodlers.length !== resultLength)
+      return ErrorResponse(new ErrorFromServer());
+    return SuccessResponse(doodlers);
   }
 }
 
