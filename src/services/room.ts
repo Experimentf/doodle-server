@@ -9,6 +9,10 @@ interface RoomServiceInterface {
   createPublicRoom: () => ServiceResponse<{ roomId: string }>;
   createPrivateRoom: (ownerId: string) => ServiceResponse<{ roomId: string }>;
   findRoom: (roomId: string) => ServiceResponse<{ room: RoomModel }>;
+  findRoomWithDoodler: (
+    roomId: string,
+    doodlerId: string
+  ) => ServiceResponse<{ room: RoomModel }>;
   removeDoodlerFromRoom: (
     roomId: string,
     doodlerId: string
@@ -50,6 +54,21 @@ class RoomService implements RoomServiceInterface {
   public findRoom(roomId: string) {
     const room = this.rooms.get(roomId);
     if (!room) return ErrorResponse(new ErrorFromServer('Room not found'));
+    return SuccessResponse({ room });
+  }
+
+  /**
+   * Find a room by room id and doodler
+   * @param roomId - Room ID of the room to be found
+   * @param doodlerId - Doodler ID
+   * @returns Room details
+   */
+  public findRoomWithDoodler(roomId: string, doodlerId: string) {
+    const { data, error } = this.findRoom(roomId);
+    if (error || !data) return ErrorResponse(error);
+    const { room } = data;
+    const doodler = room.doodlers.find((d) => d.id === doodlerId);
+    if (!doodler) return ErrorResponse(new ErrorFromServer('Invalid Room ID!'));
     return SuccessResponse({ room });
   }
 

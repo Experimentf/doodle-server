@@ -65,6 +65,15 @@ class SocketService implements SocketServiceInterface {
     socket.on(RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM, (...args) =>
       this.controller.handleRoomOnAddDoodlerToPublicRoom(socket, ...args)
     );
+    socket.on(RoomEvents.ON_ADD_DOODLER_TO_PRIVATE_ROOM, (...args) =>
+      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket, ...args)
+    );
+    socket.on(RoomEvents.ON_CREATE_PRIVATE_ROOM, (...args) =>
+      this.controller.handleRoomOnCreatePrivateRoom(socket, ...args)
+    );
+    socket.on(RoomEvents.ON_GET_ROOM, (...args) =>
+      this.controller.handleRoomOnGetRoom(socket, ...args)
+    );
   }
 
   /**
