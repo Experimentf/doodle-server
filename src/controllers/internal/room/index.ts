@@ -30,7 +30,9 @@ class RoomController implements RoomControllerInterface {
       socket.join(roomId);
 
       // Let other users in the room know
-      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler });
+      socket
+        .to(roomId)
+        .emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler: doodler.json });
 
       respond({ data: { roomId } });
     };

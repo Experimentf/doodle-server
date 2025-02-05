@@ -28,6 +28,6 @@ export interface RoomClientToServerEventsArgumentMap {
 export interface RoomServerToClientEvents {
   [RoomEvents.EMIT_DOODLER_JOIN]: (args: { doodler: DoodlerInterface }) => void;
   [RoomEvents.EMIT_DOODLER_LEAVE]: (args: {
-    doodler: DoodlerInterface;
+    doodlerId: DoodlerInterface['id'];
   }) => void;
 }
