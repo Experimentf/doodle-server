@@ -1,25 +1,20 @@
 import { DoodlerModel } from '@/models/Doodler';
 import { RoomModel } from '@/models/Room';
 import { RoomInfoMapType } from '@/types/game';
-import { ServiceResponse } from '@/types/service';
 import { ErrorFromServer } from '@/utils/error';
-import { ErrorResponse, SuccessResponse } from '@/utils/service';
 
 interface RoomServiceInterface {
-  createPublicRoom: () => ServiceResponse<{ roomId: string }>;
-  createPrivateRoom: (ownerId: string) => ServiceResponse<{ roomId: string }>;
-  findRoom: (roomId: string) => ServiceResponse<{ room: RoomModel }>;
+  createPublicRoom: () => { roomId: string };
+  createPrivateRoom: (ownerId: string) => { roomId: string };
+  findRoom: (roomId: string) => { room: RoomModel };
   findRoomWithDoodler: (
     roomId: string,
     doodlerId: string
-  ) => ServiceResponse<{ room: RoomModel }>;
-  removeDoodlerFromRoom: (
-    roomId: string,
-    doodlerId: string
-  ) => ServiceResponse<boolean>;
-  assignDoodlerToPublicRoom: (
-    doodlerId: DoodlerModel['id']
-  ) => ServiceResponse<{ roomId: string }>;
+  ) => { room: RoomModel };
+  assignDoodlerToPublicRoom: (doodlerId: DoodlerModel['id']) => {
+    roomId: string;
+  };
+  removeDoodlerFromRoom: (roomId: string, doodlerId: string) => void;
 }
 
 class RoomService implements RoomServiceInterface {
@@ -32,7 +27,7 @@ class RoomService implements RoomServiceInterface {
   public createPublicRoom() {
     const room = new RoomModel();
     this.rooms.set(room.id, room);
-    return SuccessResponse({ roomId: room.id });
+    return { roomId: room.id };
   }
 
   /**
@@ -43,7 +38,7 @@ class RoomService implements RoomServiceInterface {
   public createPrivateRoom(ownerId: string) {
     const room = new RoomModel(ownerId);
     this.rooms.set(room.id, room);
-    return SuccessResponse({ roomId: room.id });
+    return { roomId: room.id };
   }
 
   /**
@@ -53,8 +48,8 @@ class RoomService implements RoomServiceInterface {
    */
   public findRoom(roomId: string) {
     const room = this.rooms.get(roomId);
-    if (!room) return ErrorResponse(new ErrorFromServer('Room not found'));
-    return SuccessResponse({ room });
+    if (!room) throw new ErrorFromServer('Room not found');
+    return { room };
   }
 
   /**
@@ -64,12 +59,11 @@ class RoomService implements RoomServiceInterface {
    * @returns Room details
    */
   public findRoomWithDoodler(roomId: string, doodlerId: string) {
-    const { data, error } = this.findRoom(roomId);
-    if (error || !data) return ErrorResponse(error);
+    const data = this.findRoom(roomId);
     const { room } = data;
     const doodler = room.doodlers.find((id) => id === doodlerId);
-    if (!doodler) return ErrorResponse(new ErrorFromServer('Invalid Room ID!'));
-    return SuccessResponse({ room });
+    if (!doodler) throw new ErrorFromServer('Invalid Room ID!');
+    return { room };
   }
 
   /**
@@ -88,21 +82,15 @@ class RoomService implements RoomServiceInterface {
         break;
       }
     }
-    if (roomId !== undefined) return SuccessResponse({ roomId });
+    if (roomId !== undefined) return { roomId };
 
     // Create a new public room if doodler could not be assigned
-    const { data: createPublicRoomData, error: createPublicRoomError } =
-      this.createPublicRoom();
-    if (createPublicRoomError || createPublicRoomData === undefined)
-      return ErrorResponse(createPublicRoomError);
+    const createPublicRoomData = this.createPublicRoom();
     const { roomId: newRoomId } = createPublicRoomData;
 
     // Assign doodler to the newly created room
-    const { data: isDoodlerAdded, error: addDoodlerToRoomError } =
-      this.addDoodlerToRoom(newRoomId, doodlerId);
-    if (addDoodlerToRoomError || !isDoodlerAdded)
-      return ErrorResponse(addDoodlerToRoomError);
-    return SuccessResponse({ roomId: newRoomId });
+    this.addDoodlerToRoom(newRoomId, doodlerId);
+    return { roomId: newRoomId };
   }
 
   /**
@@ -114,24 +102,15 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   public removeDoodlerFromRoom(roomId: string, doodlerId: string) {
-    const { data, error } = this.findRoom(roomId);
-    if (error || !data) {
-      return ErrorResponse(error);
-    }
+    const data = this.findRoom(roomId);
     const { room } = data;
     room.removeDoodler(doodlerId);
     if (room.isEmpty()) {
-      const { data: isDeleted, error: deleteError } = this.deleteRoom(roomId);
-      if (deleteError || isDeleted === undefined)
-        return ErrorResponse(deleteError);
+      this.deleteRoom(roomId);
     }
     if (room.isOwner(doodlerId)) {
-      const { data: isSelected, error: selectError } =
-        this.selectNewOwner(roomId);
-      if (selectError || isSelected === undefined)
-        return ErrorResponse(selectError);
+      this.selectNewOwner(roomId);
     }
-    return SuccessResponse(true);
   }
 
   // PRIVATE METHODS
@@ -142,13 +121,10 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   private addDoodlerToRoom(roomId: string, doodlerId: string) {
-    const { data, error } = this.findRoom(roomId);
-    if (error || !data) {
-      return ErrorResponse(error);
-    }
+    const data = this.findRoom(roomId);
     const { room } = data;
     const isAdded = room.addDoodler(doodlerId);
-    return SuccessResponse(isAdded);
+    return isAdded;
   }
 
   /**
@@ -157,12 +133,9 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   private deleteRoom(roomId: string) {
-    const { data, error } = this.findRoom(roomId);
-    if (error || !data) {
-      return ErrorResponse(error);
-    }
-    const isDeleted = this.rooms.delete(roomId);
-    return SuccessResponse(isDeleted);
+    const data = this.findRoom(roomId);
+    const isDeleted = this.rooms.delete(data.room.id);
+    return isDeleted;
   }
 
   /**
@@ -171,13 +144,10 @@ class RoomService implements RoomServiceInterface {
    * @returns true for success, false for failure
    */
   private selectNewOwner(roomId: string) {
-    const { data, error } = this.findRoom(roomId);
-    if (error || !data) {
-      return ErrorResponse(error);
-    }
+    const data = this.findRoom(roomId);
     const { room } = data;
     const isOwnerSet = room.setOwner(room.randomDoodlerId);
-    return SuccessResponse(isOwnerSet);
+    return isOwnerSet;
   }
 
   /**
@@ -192,10 +162,8 @@ class RoomService implements RoomServiceInterface {
     }
     const randomRoomIndex = Math.round(Math.random() * (nRooms - 1));
     const id = roomIdsArray[randomRoomIndex];
-    const { data: findRoomData, error: findRoomError } = this.findRoom(id);
-    if (findRoomError || findRoomData === undefined)
-      return ErrorResponse(findRoomError);
-    return SuccessResponse({ roomId: findRoomData.room.id });
+    const findRoomData = this.findRoom(id);
+    return { roomId: findRoomData.room.id };
   }
 }
 

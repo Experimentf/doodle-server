@@ -22,8 +22,7 @@ export class GameService implements GameServiceInterface {
    * @returns true if valid, false if invalid
    */
   public static isValidGame(roomId: string) {
-    const { data, error } = RoomServiceInstance.findRoom(roomId);
-    if (error || data === undefined) return ErrorResponse(error);
+    const data = RoomServiceInstance.findRoom(roomId);
     const { room } = data;
     return SuccessResponse(room.currentSize >= MINIMUM_VALID_SIZE);
   }

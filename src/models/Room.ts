@@ -70,6 +70,7 @@ export class RoomModel {
   // Set an onwer
   public setOwner(doodlerId?: string) {
     this.ownerId = doodlerId;
+    return true;
   }
 
   // Check if the doodler is an owner of this room

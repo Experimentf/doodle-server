@@ -13,7 +13,7 @@ class SocketController implements SocketControllerInterface {
     (socket) => () => {
       socket.rooms.forEach((roomId) => {
         const doodlerId = socket.id;
-        RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId); // TODO: Handle Error
+        RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId);
         socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
           doodlerId
         });
