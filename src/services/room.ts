@@ -23,7 +23,7 @@ interface RoomServiceInterface {
 }
 
 class RoomService implements RoomServiceInterface {
-  private rooms: RoomInfoMapType = new Map<string, RoomModel>();
+  private rooms: RoomInfoMapType = new Map<string, RoomModel>(); // ROOM ID -> ROOM DETAILS
 
   /**
    * Create a new public room

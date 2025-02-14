@@ -9,7 +9,7 @@ class DoodlerController implements DoodlerControllerInterface {
    * @returns
    */
   public handleDoodlerOnGet: DoodlerControllerInterface['handleDoodlerOnGet'] =
-    (socket, _payload, respond) => {
+    (socket) => (_payload, respond) => {
       const { data, error } = DoodlerServiceInstance.findDooder(socket.id);
       if (error || !data) {
         respond({ data: null, error });
@@ -25,7 +25,7 @@ class DoodlerController implements DoodlerControllerInterface {
    * @returns
    */
   public handleDoodlerOnSet: DoodlerControllerInterface['handleDoodlerOnSet'] =
-    (socket, payload, respond) => {
+    (socket) => (payload, respond) => {
       const doodler = payload;
       const { data, error } = DoodlerServiceInstance.addDoodler({
         id: socket.id,

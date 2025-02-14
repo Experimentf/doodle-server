@@ -1,5 +1,6 @@
 import Controller, { ControllerInterface } from '@/controllers';
-import { IoType, SocketType } from '@/types/socket';
+import { ClientToServerEvents, IoType, SocketType } from '@/types/socket';
+import { ErrorFromServer } from '@/utils/error';
 
 import {
   DoodlerEvents,
@@ -36,10 +37,12 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerSocketEvents(socket: SocketType) {
-    socket.on(SocketEvents.ON_DISCONNECTING, () =>
+    socket.on(
+      SocketEvents.ON_DISCONNECTING,
       this.controller.handleSocketOnDisconnecting(socket)
     );
-    socket.on(SocketEvents.ON_DISCONNECT, () =>
+    socket.on(
+      SocketEvents.ON_DISCONNECT,
       this.controller.handleSocketOnDisconnect(socket)
     );
   }
@@ -49,11 +52,15 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerDoodlerEvents(socket: SocketType) {
-    socket.on(DoodlerEvents.ON_GET_DOODLER, (...args) =>
-      this.controller.handleDoodlerOnGet(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      DoodlerEvents.ON_GET_DOODLER,
+      this.controller.handleDoodlerOnGet(socket)
     );
-    socket.on(DoodlerEvents.ON_SET_DOODLER, (...args) =>
-      this.controller.handleDoodlerOnSet(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      DoodlerEvents.ON_SET_DOODLER,
+      this.controller.handleDoodlerOnSet(socket)
     );
   }
 
@@ -62,17 +69,25 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerRoomEvents(socket: SocketType) {
-    socket.on(RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM, (...args) =>
-      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM,
+      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket)
     );
-    socket.on(RoomEvents.ON_ADD_DOODLER_TO_PRIVATE_ROOM, (...args) =>
-      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      RoomEvents.ON_ADD_DOODLER_TO_PRIVATE_ROOM,
+      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket)
     );
-    socket.on(RoomEvents.ON_CREATE_PRIVATE_ROOM, (...args) =>
-      this.controller.handleRoomOnCreatePrivateRoom(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      RoomEvents.ON_CREATE_PRIVATE_ROOM,
+      this.controller.handleRoomOnCreatePrivateRoom(socket)
     );
-    socket.on(RoomEvents.ON_GET_ROOM, (...args) =>
-      this.controller.handleRoomOnGetRoom(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      RoomEvents.ON_GET_ROOM,
+      this.controller.handleRoomOnGetRoom(socket)
     );
   }
 
@@ -81,9 +96,39 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private registerGameEvents(socket: SocketType) {
-    socket.on(GameEvents.ON_GET_GAME, (...args) =>
-      this.controller.handleGameOnGetGame(socket, ...args)
+    this.registerCustomEvent(
+      socket,
+      GameEvents.ON_GET_GAME,
+      this.controller.handleGameOnGetGame(socket)
     );
+  }
+
+  /**
+   * USE THIS CAREFULLY
+   * INTENDED ONLY FOR CUSTOM EVENTS AND NOT FOR RESERVED EVENTS
+   * @param socket Socket
+   * @param event Event Name
+   * @param handler Event Handler
+   */
+  private registerCustomEvent(
+    socket: SocketType,
+    event: keyof ClientToServerEvents,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handler: any
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on(event, (...args: any) => {
+      const respond = args[1];
+      try {
+        handler(...args);
+      } catch (e) {
+        if (e instanceof ErrorFromServer) {
+          respond({ error: e });
+        } else {
+          console.error(e);
+        }
+      }
+    });
   }
 }
 

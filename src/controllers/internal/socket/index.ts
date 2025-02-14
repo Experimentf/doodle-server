@@ -10,7 +10,7 @@ class SocketController implements SocketControllerInterface {
    * Handle the socket disconnecting event
    */
   public handleSocketOnDisconnecting: SocketControllerInterface['handleSocketOnDisconnecting'] =
-    (socket) => {
+    (socket) => () => {
       socket.rooms.forEach((roomId) => {
         const doodlerId = socket.id;
         RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId); // TODO: Handle Error
@@ -29,7 +29,7 @@ class SocketController implements SocketControllerInterface {
    * Handle the socket disconnect event
    */
   public handleSocketOnDisconnect: SocketControllerInterface['handleSocketOnDisconnect'] =
-    (socket) => {
+    (socket) => () => {
       console.log('User disconnected :', socket.id);
     };
 }

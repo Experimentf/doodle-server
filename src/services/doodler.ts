@@ -18,7 +18,7 @@ class DoodlerService implements DoodlerServiceInterface {
   public readonly doodlers: Map<string, DoodlerModel> = new Map<
     string,
     DoodlerModel
-  >();
+  >(); // DOODLER ID -> DOODLER DETAILS
 
   /**
    * Add a doodler to the list of doodlers
