@@ -17,7 +17,7 @@ class SocketController implements SocketControllerInterface {
         socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
           doodlerId
         });
-        const { data: isValidGame } = GameService.isValidGame(roomId); // TODO: Handle Error
+        const isValidGame = GameService.isValidGame(roomId); // TODO: Handle Error
         if (!isValidGame) {
           socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
         }

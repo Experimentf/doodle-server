@@ -12,13 +12,7 @@ class GameController implements GameControllerInterface {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_socket) => (payload, respond) => {
       const gameId = payload;
-      const { data: gameDetailsData, error: gameDetailsError } =
-        GameServiceInstance.findGame(gameId);
-      console.log(GameServiceInstance.gameDetailMap);
-      if (gameDetailsError || !gameDetailsData) {
-        respond({ error: gameDetailsError });
-        return;
-      }
+      const gameDetailsData = GameServiceInstance.findGame(gameId);
       const { game } = gameDetailsData;
       // const { data: isValidGameData } = GameService.isValidGame(roomId);
       // // TODO: Check for room is public

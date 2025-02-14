@@ -1,16 +1,14 @@
 import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import GameModel from '@/models/Game';
 import { GameInfoMapType } from '@/types/game';
-import { ServiceResponse } from '@/types/service';
 import { ErrorFromServer } from '@/utils/error';
-import { ErrorResponse, SuccessResponse } from '@/utils/service';
 
 import RoomServiceInstance from './room';
 
 interface GameServiceInterface {
-  findGame: (roomId: string) => ServiceResponse<{ game: GameModel }>;
-  startGame: (roomId: string) => ServiceResponse<boolean>;
-  createGame: (roomId: string) => ServiceResponse<{ game: GameModel }>;
+  findGame: (gameId: string) => { game: GameModel };
+  startGame: (gameId: string) => void;
+  createGame: () => { game: GameModel };
 }
 
 export class GameService implements GameServiceInterface {
@@ -24,7 +22,7 @@ export class GameService implements GameServiceInterface {
   public static isValidGame(roomId: string) {
     const data = RoomServiceInstance.findRoom(roomId);
     const { room } = data;
-    return SuccessResponse(room.currentSize >= MINIMUM_VALID_SIZE);
+    return room.currentSize >= MINIMUM_VALID_SIZE;
   }
 
   /**
@@ -33,10 +31,8 @@ export class GameService implements GameServiceInterface {
    * @returns
    */
   public startGame(gameId: string) {
-    const { data, error } = this.findGame(gameId);
-    if (error || data === undefined) return ErrorResponse(error);
+    this.findGame(gameId);
     // TODO: Finish implementation
-    return SuccessResponse(true);
   }
 
   /**
@@ -46,9 +42,8 @@ export class GameService implements GameServiceInterface {
   public createGame() {
     const newGame = new GameModel();
     this.gameDetailMap.set(newGame.id, newGame);
-    const { data, error } = this.findGame(newGame.id);
-    if (error || data === undefined) return ErrorResponse(error);
-    return SuccessResponse({ game: data.game });
+    const data = this.findGame(newGame.id);
+    return { game: data.game };
   }
 
   /**
@@ -58,8 +53,8 @@ export class GameService implements GameServiceInterface {
    */
   public findGame(gameId: string) {
     const game = this.gameDetailMap.get(gameId);
-    if (!game) return ErrorResponse(new ErrorFromServer());
-    return SuccessResponse({ game });
+    if (!game) throw new ErrorFromServer('Could not find game!');
+    return { game };
   }
 }
 
