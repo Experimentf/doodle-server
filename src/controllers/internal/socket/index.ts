@@ -21,7 +21,7 @@ class SocketController implements SocketControllerInterface {
         if (!isValidGame) {
           socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
         }
-        DoodlerServiceInstance.removeDoodler(socket.id); // TODO: Handle Error
+        DoodlerServiceInstance.removeDoodler(socket.id);
       });
     };
 

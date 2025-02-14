@@ -11,12 +11,7 @@ class RoomController implements RoomControllerInterface {
    */
   public handleRoomOnAddDoodlerToPublicRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPublicRoom'] =
     (socket) => (_payload, respond) => {
-      const { data: doodlerData, error: findDoodlerError } =
-        DoodlerServiceInstance.findDooder(socket.id);
-      if (findDoodlerError || doodlerData === undefined) {
-        respond({ data: null, error: findDoodlerError });
-        return;
-      }
+      const doodlerData = DoodlerServiceInstance.findDooder(socket.id);
       const { doodler } = doodlerData;
       const { data: roomAssignmentData, error: roomAssignmentError } =
         RoomServiceInstance.assignDoodlerToPublicRoom(doodler.id);
@@ -62,12 +57,7 @@ class RoomController implements RoomControllerInterface {
         return;
       }
       const room = findRoomData.room.json;
-      const { data: getDoodlersData, error: getDoodlersError } =
-        DoodlerServiceInstance.getDoodlers(room.doodlers);
-      if (getDoodlersError || getDoodlersData === undefined) {
-        respond({ error: getDoodlersError });
-        return;
-      }
+      const getDoodlersData = DoodlerServiceInstance.getDoodlers(room.doodlers);
       const doodlers = getDoodlersData.map((d) => d.json);
       respond({ data: { room, doodlers } });
     };

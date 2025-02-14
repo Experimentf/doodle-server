@@ -1,17 +1,13 @@
 import { DoodlerModel } from '@/models/Doodler';
-import { ServiceResponse } from '@/types/service';
 import { ErrorFromServer } from '@/utils/error';
-import { ErrorResponse, SuccessResponse } from '@/utils/service';
 
 interface DoodlerServiceInterface {
-  addDoodler: (doodler: {
-    id: string;
-    name: string;
-    avatar: object;
-  }) => ServiceResponse<{ doodlerId: string }>;
-  removeDoodler: (doodlerId: string) => ServiceResponse<boolean>;
-  findDooder: (doodlerId: string) => ServiceResponse<{ doodler: DoodlerModel }>;
-  getDoodlers: (doodlerIds: string[]) => ServiceResponse<DoodlerModel[]>;
+  addDoodler: (doodler: { id: string; name: string; avatar: object }) => {
+    doodlerId: string;
+  };
+  removeDoodler: (doodlerId: string) => boolean;
+  findDooder: (doodlerId: string) => { doodler: DoodlerModel };
+  getDoodlers: (doodlerIds: string[]) => DoodlerModel[];
 }
 
 class DoodlerService implements DoodlerServiceInterface {
@@ -33,7 +29,7 @@ class DoodlerService implements DoodlerServiceInterface {
     const { id, name, avatar } = doodlerProps;
     const doodler = new DoodlerModel(id, name, avatar);
     this.doodlers.set(id, doodler);
-    return SuccessResponse({ doodlerId: doodler.id });
+    return { doodlerId: doodler.id };
   }
 
   /**
@@ -42,7 +38,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @returns true | false
    */
   public removeDoodler(doodlerId: string) {
-    return SuccessResponse(this.doodlers.delete(doodlerId));
+    return this.doodlers.delete(doodlerId);
   }
 
   /**
@@ -52,9 +48,8 @@ class DoodlerService implements DoodlerServiceInterface {
    */
   public findDooder(doodlerId: string) {
     const doodler = this.doodlers.get(doodlerId);
-    if (!doodler)
-      return ErrorResponse(new ErrorFromServer('Doodler not found!'));
-    return SuccessResponse({ doodler });
+    if (!doodler) throw new ErrorFromServer('Doodler not found!');
+    return { doodler };
   }
 
   /**
@@ -67,13 +62,11 @@ class DoodlerService implements DoodlerServiceInterface {
     const doodlers = [];
     for (let i = 0; i < resultLength; i++) {
       const id = doodlerIds[i];
-      const { data, error } = this.findDooder(id);
-      if (error || data === undefined) break;
+      const data = this.findDooder(id);
       doodlers.push(data.doodler);
     }
-    if (doodlers.length !== resultLength)
-      return ErrorResponse(new ErrorFromServer());
-    return SuccessResponse(doodlers);
+    if (doodlers.length !== resultLength) throw new ErrorFromServer();
+    return doodlers;
   }
 }
 
