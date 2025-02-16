@@ -8,7 +8,7 @@ export enum SocketEvents {
   ON_DISCONNECT = 'disconnect'
 }
 
-export enum RoomEvents {
+export enum RoomSocketEvents {
   ON_ADD_DOODLER_TO_PUBLIC_ROOM = 'add-doodler-to-public-room',
   ON_ADD_DOODLER_TO_PRIVATE_ROOM = 'add-doodler-to-private-room',
   ON_CREATE_PRIVATE_ROOM = 'create-private-room',
@@ -17,12 +17,12 @@ export enum RoomEvents {
   EMIT_DOODLER_LEAVE = 'doodler-leave'
 }
 
-export enum DoodlerEvents {
+export enum DoodlerSocketEvents {
   ON_GET_DOODLER = 'get-doodler',
   ON_SET_DOODLER = 'set-doodler'
 }
 
-export enum GameEvents {
+export enum GameSocketEvents {
   ON_GET_GAME = 'get-game',
   EMIT_GAME_START = 'game-start',
   EMIT_GAME_LOBBY = 'game-lobby',

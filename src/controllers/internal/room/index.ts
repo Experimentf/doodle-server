@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { GameEvents, RoomEvents } from '@/constants/events';
+import { GameSocketEvents, RoomSocketEvents } from '@/constants/events/socket';
 import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
 import GameServiceInstance from '@/services/game/GameService';
 import RoomServiceInstance from '@/services/room/RoomService';
@@ -22,7 +22,7 @@ class RoomController implements RoomControllerInterface {
       socket.join(roomId);
 
       // Let other users in the room know
-      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler });
+      socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_JOIN, { doodler });
 
       let game: GameInterface | undefined = undefined;
       if (!gameId) {
@@ -38,11 +38,11 @@ class RoomController implements RoomControllerInterface {
       const isValidGameRoom = await RoomServiceInstance.isValidGameRoom(roomId);
       if (!gameId || !isValidGameRoom) {
         await GameServiceInstance.moveToLobby(game.id);
-        socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
+        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_LOBBY);
       } else if (game.status === GameStatus.LOBBY && isValidGameRoom) {
         await GameServiceInstance.moveToGame(game.id);
         const drawerId = await RoomServiceInstance.changeDrawerTurn(roomId);
-        socket.to(roomId).emit(GameEvents.EMIT_GAME_START, { drawerId });
+        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_START, { drawerId });
       }
 
       respond({ data: { roomId } });

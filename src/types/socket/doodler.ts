@@ -1,4 +1,4 @@
-import { DoodlerEvents } from '@/constants/events';
+import { DoodlerSocketEvents } from '@/constants/events/socket';
 import { DoodlerModel } from '@/models/DoodlerModel';
 
 import { ClientToServerEventsArgument } from './helper';
@@ -6,11 +6,11 @@ import { ClientToServerEventsArgument } from './helper';
 export type DoodlerInterface = DoodlerModel['json'];
 
 export interface DoodlerClientToServerEventsArgumentMap {
-  [DoodlerEvents.ON_GET_DOODLER]: ClientToServerEventsArgument<
+  [DoodlerSocketEvents.ON_GET_DOODLER]: ClientToServerEventsArgument<
     undefined,
     DoodlerInterface
   >;
-  [DoodlerEvents.ON_SET_DOODLER]: ClientToServerEventsArgument<
+  [DoodlerSocketEvents.ON_SET_DOODLER]: ClientToServerEventsArgument<
     Pick<DoodlerInterface, 'name' | 'avatar'>,
     Pick<DoodlerInterface, 'id'>
   >;
