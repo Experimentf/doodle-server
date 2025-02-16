@@ -6,9 +6,9 @@ import { ErrorFromServer } from '@/utils/error';
 import RoomServiceInstance from './room';
 
 interface GameServiceInterface {
-  findGame: (gameId: string) => { game: GameModel };
-  startGame: (gameId: string) => void;
-  createGame: () => { game: GameModel };
+  findGame: (gameId: string) => Promise<{ game: GameModel }>;
+  startGame: (gameId: string) => Promise<void>;
+  createGame: () => Promise<{ game: GameModel }>;
 }
 
 export class GameService implements GameServiceInterface {
@@ -19,10 +19,13 @@ export class GameService implements GameServiceInterface {
    * @param roomId RoomID to check validity for game
    * @returns true if valid, false if invalid
    */
-  public static isValidGame(roomId: string) {
-    const data = RoomServiceInstance.findRoom(roomId);
-    const { room } = data;
-    return room.currentSize >= MINIMUM_VALID_SIZE;
+  public static async isValidGame(roomId: string) {
+    try {
+      const { room } = await RoomServiceInstance.findRoom(roomId);
+      return room.currentSize >= MINIMUM_VALID_SIZE;
+    } catch (e) {
+      return false;
+    }
   }
 
   /**
@@ -30,8 +33,8 @@ export class GameService implements GameServiceInterface {
    * @param gameId Game ID for which game needs to be started
    * @returns
    */
-  public startGame(gameId: string) {
-    this.findGame(gameId);
+  public async startGame(gameId: string) {
+    await this.findGame(gameId);
     // TODO: Finish implementation
   }
 
@@ -39,10 +42,10 @@ export class GameService implements GameServiceInterface {
    *
    * @returns id - New game's id
    */
-  public createGame() {
+  public async createGame() {
     const newGame = new GameModel();
     this.gameDetailMap.set(newGame.id, newGame);
-    const data = this.findGame(newGame.id);
+    const data = await this.findGame(newGame.id);
     return { game: data.game };
   }
 
@@ -51,7 +54,7 @@ export class GameService implements GameServiceInterface {
    * @param gameId Game ID whose game needs to be found
    * @returns
    */
-  public findGame(gameId: string) {
+  public async findGame(gameId: string) {
     const game = this.gameDetailMap.get(gameId);
     if (!game) throw new ErrorFromServer('Could not find game!');
     return { game };

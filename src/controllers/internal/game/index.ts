@@ -10,10 +10,9 @@ class GameController implements GameControllerInterface {
    */
   public handleGameOnGetGame: GameControllerInterface['handleGameOnGetGame'] =
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_socket) => (payload, respond) => {
+    (_socket) => async (payload, respond) => {
       const gameId = payload;
-      const gameDetailsData = GameServiceInstance.findGame(gameId);
-      const { game } = gameDetailsData;
+      const { game } = await GameServiceInstance.findGame(gameId);
       // const { data: isValidGameData } = GameService.isValidGame(roomId);
       // // TODO: Check for room is public
       // if (isValidGameData) {

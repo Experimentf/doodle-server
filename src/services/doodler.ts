@@ -2,12 +2,16 @@ import { DoodlerModel } from '@/models/Doodler';
 import { ErrorFromServer } from '@/utils/error';
 
 interface DoodlerServiceInterface {
-  addDoodler: (doodler: { id: string; name: string; avatar: object }) => {
+  addDoodler: (doodler: {
+    id: string;
+    name: string;
+    avatar: object;
+  }) => Promise<{
     doodlerId: string;
-  };
-  removeDoodler: (doodlerId: string) => boolean;
-  findDooder: (doodlerId: string) => { doodler: DoodlerModel };
-  getDoodlers: (doodlerIds: string[]) => DoodlerModel[];
+  }>;
+  removeDoodler: (doodlerId: string) => Promise<boolean>;
+  findDooder: (doodlerId: string) => Promise<{ doodler: DoodlerModel }>;
+  getDoodlers: (doodlerIds: string[]) => Promise<DoodlerModel[]>;
 }
 
 class DoodlerService implements DoodlerServiceInterface {
@@ -21,7 +25,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @param doodlerProps Properties to be set for the new doodler
    * @returns New Doodler's ID
    */
-  public addDoodler(doodlerProps: {
+  public async addDoodler(doodlerProps: {
     id: string;
     name: string;
     avatar: object;
@@ -37,7 +41,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @param doodlerId Doddler's id that needs to be removed
    * @returns true | false
    */
-  public removeDoodler(doodlerId: string) {
+  public async removeDoodler(doodlerId: string) {
     return this.doodlers.delete(doodlerId);
   }
 
@@ -46,7 +50,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @param doodlerId Doodler's id that needs to be found
    * @returns Doodler
    */
-  public findDooder(doodlerId: string) {
+  public async findDooder(doodlerId: string) {
     const doodler = this.doodlers.get(doodlerId);
     if (!doodler) throw new ErrorFromServer('Doodler not found!');
     return { doodler };
@@ -57,14 +61,14 @@ class DoodlerService implements DoodlerServiceInterface {
    * @param doodlerIds Doodler IDs for which doodlers are requested
    * @returns - Array of Doodlers
    */
-  public getDoodlers(doodlerIds: string[]) {
+  public async getDoodlers(doodlerIds: string[]) {
     const resultLength = doodlerIds.length;
-    const doodlers = [];
-    for (let i = 0; i < resultLength; i++) {
-      const id = doodlerIds[i];
-      const data = this.findDooder(id);
-      doodlers.push(data.doodler);
-    }
+    const doodlers = await Promise.all(
+      doodlerIds.map(async (id) => {
+        const data = await this.findDooder(id);
+        return data.doodler;
+      })
+    );
     if (doodlers.length !== resultLength) throw new ErrorFromServer();
     return doodlers;
   }

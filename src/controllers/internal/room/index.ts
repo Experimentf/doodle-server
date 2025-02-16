@@ -10,13 +10,12 @@ class RoomController implements RoomControllerInterface {
    * Handle when the client wants to be added to a public room
    */
   public handleRoomOnAddDoodlerToPublicRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPublicRoom'] =
-    (socket) => (_payload, respond) => {
-      const doodlerData = DoodlerServiceInstance.findDooder(socket.id);
+    (socket) => async (_payload, respond) => {
+      const doodlerData = await DoodlerServiceInstance.findDooder(socket.id);
       const { doodler } = doodlerData;
-      const roomAssignmentData = RoomServiceInstance.assignDoodlerToPublicRoom(
+      const { roomId } = await RoomServiceInstance.assignDoodlerToPublicRoom(
         doodler.id
       );
-      const { roomId } = roomAssignmentData;
 
       // Join the new room
       socket.join(roomId);
@@ -45,16 +44,17 @@ class RoomController implements RoomControllerInterface {
    * Handle when the client wants to get room details
    */
   public handleRoomOnGetRoom: RoomControllerInterface['handleRoomOnGetRoom'] =
-    (socket) => (payload, respond) => {
+    (socket) => async (payload, respond) => {
       const roomId = payload;
-      const findRoomData = RoomServiceInstance.findRoomWithDoodler(
+      const { room } = await RoomServiceInstance.findRoomWithDoodler(
         roomId,
         socket.id
       );
-      const room = findRoomData.room.json;
-      const getDoodlersData = DoodlerServiceInstance.getDoodlers(room.doodlers);
+      const getDoodlersData = await DoodlerServiceInstance.getDoodlers(
+        room.doodlers
+      );
       const doodlers = getDoodlersData.map((d) => d.json);
-      respond({ data: { room, doodlers } });
+      respond({ data: { room: room.json, doodlers } });
     };
 }
 

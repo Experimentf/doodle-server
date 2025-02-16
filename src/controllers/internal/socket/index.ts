@@ -10,17 +10,22 @@ class SocketController implements SocketControllerInterface {
    * Handle the socket disconnecting event
    */
   public handleSocketOnDisconnecting: SocketControllerInterface['handleSocketOnDisconnecting'] =
-    (socket) => () => {
-      socket.rooms.forEach((roomId) => {
-        const doodlerId = socket.id;
-        RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId);
-        socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
-          doodlerId
-        });
-        const isValidGame = GameService.isValidGame(roomId); // TODO: Handle Error
-        if (!isValidGame) {
-          socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
-        }
+    (socket) => async () => {
+      const roomIds: string[] = [];
+      socket.rooms.forEach((id) => id != socket.id && roomIds.push(id));
+      Promise.all(
+        roomIds.map(async (roomId) => {
+          const doodlerId = socket.id;
+          await RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId);
+          socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
+            doodlerId
+          });
+          const isValidGame = await GameService.isValidGame(roomId);
+          if (!isValidGame) {
+            socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
+          }
+        })
+      ).finally(async () => {
         DoodlerServiceInstance.removeDoodler(socket.id);
       });
     };
