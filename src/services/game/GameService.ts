@@ -1,18 +1,8 @@
 import GameModel from '@/models/GameModel';
 import { GameInfoMapType, GameOptions, GameStatus } from '@/types/game';
-import { GameInterface } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
 
-interface GameServiceInterface {
-  // FUNDAMENTALS
-  findGame: (gameId: string) => Promise<{ game: GameInterface }>;
-  startGame: (gameId: string) => Promise<void>;
-  createGame: () => Promise<{ game: GameInterface }>;
-
-  // GAME
-  moveToLobby: (gameId: string) => Promise<void>;
-  moveToGame: (gameId: string) => Promise<void>;
-}
+import { GameServiceInterface } from './interface';
 
 class GameService implements GameServiceInterface {
   private _games: GameInfoMapType = new Map<string, GameModel>(); // GAME ID -> GAME DETAILS

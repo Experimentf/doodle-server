@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { GameEvents, RoomEvents } from '@/constants/events';
-import DoodlerServiceInstance from '@/services/DoodlerService';
-import GameServiceInstance from '@/services/GameService';
-import RoomServiceInstance from '@/services/RoomService';
+import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
+import GameServiceInstance from '@/services/game/GameService';
+import RoomServiceInstance from '@/services/room/RoomService';
 import { GameStatus } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
 

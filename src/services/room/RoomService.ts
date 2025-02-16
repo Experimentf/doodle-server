@@ -1,35 +1,10 @@
 import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import { RoomModel } from '@/models/RoomModel';
 import { RoomInfoMapType } from '@/types/game';
-import { DoodlerInterface } from '@/types/socket/doodler';
-import { GameInterface } from '@/types/socket/game';
 import { RoomInterface } from '@/types/socket/room';
 import { DoodleServerError } from '@/utils/error';
 
-interface RoomServiceInterface {
-  // FUNDAMENTALS
-  isValidGameRoom: (roomId: string) => Promise<boolean>;
-  createPublicRoom: () => Promise<{ roomId: string }>;
-  createPrivateRoom: (ownerId: string) => Promise<{ roomId: string }>;
-  findRoom: (roomId: string) => Promise<{ room: RoomInterface }>;
-
-  // ROOM WITH DOODLER
-  findRoomWithDoodler: (
-    roomId: string,
-    doodlerId: string
-  ) => Promise<{ room: RoomInterface }>;
-  assignDoodlerToPublicRoom: (
-    doodlerId: DoodlerInterface['id']
-  ) => Promise<RoomInterface>;
-  removeDoodlerFromRoom: (roomId: string, doodlerId: string) => Promise<void>;
-
-  // ROOM WITH GAME
-  assignGameToRoom: (
-    roomId: string,
-    gameId: GameInterface['id']
-  ) => Promise<void>;
-  changeDrawerTurn: (roomId: string) => Promise<DoodlerInterface['id']>;
-}
+import { RoomServiceInterface } from './interface';
 
 class RoomService implements RoomServiceInterface {
   private _rooms: RoomInfoMapType = new Map<string, RoomModel>(); // ROOM ID -> ROOM DETAILS

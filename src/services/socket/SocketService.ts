@@ -1,17 +1,14 @@
-import Controller, { ControllerInterface } from '@/controllers';
-import { ClientToServerEvents, IoType, SocketType } from '@/types/socket';
-import { DoodleServerError } from '@/utils/error';
-
 import {
   DoodlerEvents,
   GameEvents,
   RoomEvents,
   SocketEvents
-} from '../constants/events';
+} from '@/constants/events';
+import Controller, { ControllerInterface } from '@/controllers';
+import { ClientToServerEvents, IoType, SocketType } from '@/types/socket';
+import { DoodleServerError } from '@/utils/error';
 
-interface SocketServiceInterface {
-  start: (io: IoType) => void;
-}
+import { SocketServiceInterface } from './interface';
 
 class SocketService implements SocketServiceInterface {
   private _io?: IoType;

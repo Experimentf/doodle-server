@@ -1,4 +1,4 @@
-import GameServiceInstance from '@/services/GameService';
+import GameServiceInstance from '@/services/game/GameService';
 
 import { GameControllerInterface } from './interface';
 
