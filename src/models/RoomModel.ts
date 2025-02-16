@@ -1,7 +1,6 @@
 import { DEFAULT_CAPACITY } from '@/constants/game';
+import { DoodlerInterface } from '@/types/socket/doodler';
 import { generateId } from '@/utils/unique';
-
-import { DoodlerModel } from './DoodlerModel';
 
 /**
  * FOR USE INSIDE ROOM SERVICE ONLY
@@ -10,7 +9,7 @@ import { DoodlerModel } from './DoodlerModel';
 export class RoomModel {
   // Public Variables
   public readonly id: string;
-  public readonly doodlers = new Array<DoodlerModel['id']>();
+  public readonly doodlers = new Array<DoodlerInterface['id']>();
   public readonly isPrivate: boolean;
   public readonly capacity = DEFAULT_CAPACITY;
 

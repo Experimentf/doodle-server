@@ -30,13 +30,13 @@ class RoomController implements RoomControllerInterface {
    * Handle when the client wants to be added to a private room
    */
   public handleRoomOnAddDoodlerToPrivateRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPrivateRoom'] =
-    (socket) => (_payload, _respond) => {};
+    (socket) => async (_payload, _respond) => {};
 
   /**
    * Handle when the client wants to create a private room
    */
   public handleRoomOnCreatePrivateRoom: RoomControllerInterface['handleRoomOnCreatePrivateRoom'] =
-    (socket) => (_payload, _respond) => {};
+    (socket) => async (_payload, _respond) => {};
 
   /**
    * Handle when the client wants to get room details

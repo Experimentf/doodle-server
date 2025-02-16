@@ -1,6 +1,6 @@
 import Controller, { ControllerInterface } from '@/controllers';
 import { ClientToServerEvents, IoType, SocketType } from '@/types/socket';
-import { ErrorFromServer } from '@/utils/error';
+import { DoodleServerError } from '@/utils/error';
 
 import {
   DoodlerEvents,
@@ -124,7 +124,7 @@ class SocketService implements SocketServiceInterface {
       try {
         await handler(...args);
       } catch (e) {
-        if (e instanceof ErrorFromServer) {
+        if (e instanceof DoodleServerError) {
           respond({ error: e });
         } else {
           console.error(e);

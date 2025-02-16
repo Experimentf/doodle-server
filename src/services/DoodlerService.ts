@@ -1,6 +1,6 @@
 import { DoodlerModel } from '@/models/DoodlerModel';
 import { DoodlerInterface } from '@/types/socket/doodler';
-import { ErrorFromServer } from '@/utils/error';
+import { DoodleServerError } from '@/utils/error';
 
 interface DoodlerServiceInterface {
   addDoodler: (doodler: {
@@ -53,7 +53,7 @@ class DoodlerService implements DoodlerServiceInterface {
    */
   public async findDooder(doodlerId: string) {
     const doodler = this._doodlers.get(doodlerId);
-    if (!doodler) throw new ErrorFromServer('Doodler not found!');
+    if (!doodler) throw new DoodleServerError('Doodler not found!');
     return { doodler: doodler.json };
   }
 
@@ -70,7 +70,7 @@ class DoodlerService implements DoodlerServiceInterface {
         return doodler;
       })
     );
-    if (doodlers.length !== resultLength) throw new ErrorFromServer();
+    if (doodlers.length !== resultLength) throw new DoodleServerError();
     return doodlers;
   }
 }

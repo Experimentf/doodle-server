@@ -2,7 +2,7 @@ import { DoodlerModel } from '@/models/DoodlerModel';
 import { RoomModel } from '@/models/RoomModel';
 import { RoomInfoMapType } from '@/types/game';
 import { RoomInterface } from '@/types/socket/room';
-import { ErrorFromServer } from '@/utils/error';
+import { DoodleServerError } from '@/utils/error';
 
 interface RoomServiceInterface {
   createPublicRoom: () => Promise<{ roomId: string }>;
@@ -49,7 +49,7 @@ class RoomService implements RoomServiceInterface {
    */
   public async findRoom(roomId: string) {
     const room = this._rooms.get(roomId);
-    if (!room) throw new ErrorFromServer('Room not found');
+    if (!room) throw new DoodleServerError('Room not found');
     return { room: room.json };
   }
 
@@ -63,7 +63,7 @@ class RoomService implements RoomServiceInterface {
     const data = await this.findRoom(roomId);
     const { room } = data;
     const doodler = room.doodlers.find((id) => id === doodlerId);
-    if (!doodler) throw new ErrorFromServer('Invalid Room ID!');
+    if (!doodler) throw new DoodleServerError('Invalid Room ID!');
     return { room };
   }
 
@@ -120,7 +120,7 @@ class RoomService implements RoomServiceInterface {
    */
   private async _findRoomModel(roomId: string) {
     const room = this._rooms.get(roomId);
-    if (!room) throw new ErrorFromServer('Room not found');
+    if (!room) throw new DoodleServerError('Room not found');
     return { room: room };
   }
 

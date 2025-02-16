@@ -34,7 +34,7 @@ class SocketController implements SocketControllerInterface {
    * Handle the socket disconnect event
    */
   public handleSocketOnDisconnect: SocketControllerInterface['handleSocketOnDisconnect'] =
-    (socket) => () => {
+    (socket) => async () => {
       console.log('User disconnected :', socket.id);
     };
 }

@@ -1,7 +1,7 @@
-export class ErrorFromServer extends Error {
+export class DoodleServerError extends Error {
   constructor(message?: string) {
     super(message);
-    this.name = 'ErrorFromServer';
+    this.name = 'DoodleServerError';
     this.message = message ?? 'Something went wrong!';
   }
 

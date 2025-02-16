@@ -2,7 +2,7 @@ import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import GameModel from '@/models/GameModel';
 import { GameInfoMapType } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
-import { ErrorFromServer } from '@/utils/error';
+import { DoodleServerError } from '@/utils/error';
 
 import RoomServiceInstance from './RoomService';
 
@@ -57,7 +57,7 @@ export class GameService implements GameServiceInterface {
    */
   public async findGame(gameId: string) {
     const game = this._games.get(gameId);
-    if (!game) throw new ErrorFromServer('Could not find game!');
+    if (!game) throw new DoodleServerError('Could not find game!');
     return { game: game.json };
   }
 }

@@ -1,6 +1,6 @@
-import { ErrorFromServer } from '@/utils/error';
+import { DoodleServerError } from '@/utils/error';
 
-type EmitResponse<T> = { data?: T | null; error?: ErrorFromServer };
+type EmitResponse<T> = { data?: T | null; error?: DoodleServerError };
 
 export type ClientToServerEventsArgument<T, K> = {
   payload: T;
