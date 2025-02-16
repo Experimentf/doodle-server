@@ -28,6 +28,7 @@ interface RoomServiceInterface {
     roomId: string,
     gameId: GameInterface['id']
   ) => Promise<void>;
+  changeDrawerTurn: (roomId: string) => Promise<DoodlerInterface['id']>;
 }
 
 class RoomService implements RoomServiceInterface {
@@ -148,6 +149,11 @@ class RoomService implements RoomServiceInterface {
   public async assignGameToRoom(roomId: string, gameId: string) {
     const { room } = await this._findRoomModel(roomId);
     room.setGame(gameId);
+  }
+
+  public async changeDrawerTurn(roomId: string) {
+    const { room } = await this._findRoomModel(roomId);
+    return room.nextTurn();
   }
 
   // PRIVATE METHODS

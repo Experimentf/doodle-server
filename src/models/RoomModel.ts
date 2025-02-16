@@ -16,22 +16,12 @@ export class RoomModel {
   // Private Variables
   private _ownerId?: string;
   private _gameId?: string;
+  private _drawerId?: string;
 
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
     this.isPrivate = ownerId !== undefined;
     this.setOwner(ownerId);
-  }
-
-  public get json() {
-    return {
-      id: this.id,
-      capacity: this.capacity,
-      isPrivate: this.isPrivate,
-      doodlers: this.doodlers,
-      ownerId: this._ownerId,
-      gameId: this._gameId
-    };
   }
 
   // Returns the current owner of the room
@@ -83,5 +73,26 @@ export class RoomModel {
   // Returns if the room has no doodlers
   public isEmpty() {
     return this.doodlers.length === 0;
+  }
+
+  // Move the drawer to the next doodler
+  public nextTurn() {
+    const index = this.doodlers.findIndex((id) => id === this._drawerId);
+    let newIndex = index + 1;
+    if (index === -1 || index === this.doodlers.length - 1) newIndex = 0;
+    this._drawerId = this.doodlers[newIndex];
+    return this._drawerId;
+  }
+
+  public get json() {
+    return {
+      id: this.id,
+      capacity: this.capacity,
+      isPrivate: this.isPrivate,
+      doodlers: this.doodlers,
+      ownerId: this._ownerId,
+      gameId: this._gameId,
+      drawerId: this._drawerId
+    };
   }
 }
