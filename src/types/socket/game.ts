@@ -1,5 +1,5 @@
 import { GameEvents } from '@/constants/events';
-import GameModel from '@/models/Game';
+import GameModel from '@/models/GameModel';
 
 import { ClientToServerEventsArgument } from './helper';
 

@@ -1,7 +1,7 @@
 import { DEFAULT_CAPACITY } from '@/constants/game';
 import { generateId } from '@/utils/unique';
 
-import { DoodlerModel } from './Doodler';
+import { DoodlerModel } from './DoodlerModel';
 
 /**
  * FOR USE INSIDE ROOM SERVICE ONLY

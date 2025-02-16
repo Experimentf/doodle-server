@@ -1,4 +1,4 @@
-import { DoodlerModel } from '@/models/Doodler';
+import { DoodlerModel } from '@/models/DoodlerModel';
 import { DoodlerInterface } from '@/types/socket/doodler';
 import { ErrorFromServer } from '@/utils/error';
 

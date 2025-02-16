@@ -1,5 +1,5 @@
 import { DoodlerEvents } from '@/constants/events';
-import { DoodlerModel } from '@/models/Doodler';
+import { DoodlerModel } from '@/models/DoodlerModel';
 
 import { ClientToServerEventsArgument } from './helper';
 

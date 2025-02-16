@@ -1,4 +1,4 @@
-import DoodlerServiceInstance from '@/services/doodler';
+import DoodlerServiceInstance from '@/services/DoodlerService';
 
 import { DoodlerControllerInterface } from './interface';
 

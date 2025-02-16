@@ -1,5 +1,5 @@
 import { RoomEvents } from '@/constants/events';
-import { RoomModel } from '@/models/Room';
+import { RoomModel } from '@/models/RoomModel';
 
 import { DoodlerInterface } from './doodler';
 import { ClientToServerEventsArgument } from './helper';

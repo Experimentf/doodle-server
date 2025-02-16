@@ -10,7 +10,7 @@ import {
   SocketData
 } from '@/types/socket';
 
-import SocketServiceInstance from './services/socket';
+import SocketServiceInstance from './services/SocketService';
 
 config();
 

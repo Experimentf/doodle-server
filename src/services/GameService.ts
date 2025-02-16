@@ -1,10 +1,10 @@
 import { MINIMUM_VALID_SIZE } from '@/constants/game';
-import GameModel from '@/models/Game';
+import GameModel from '@/models/GameModel';
 import { GameInfoMapType } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
 import { ErrorFromServer } from '@/utils/error';
 
-import RoomServiceInstance from './room';
+import RoomServiceInstance from './RoomService';
 
 interface GameServiceInterface {
   findGame: (gameId: string) => Promise<{ game: GameInterface }>;

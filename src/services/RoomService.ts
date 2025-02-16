@@ -1,5 +1,5 @@
-import { DoodlerModel } from '@/models/Doodler';
-import { RoomModel } from '@/models/Room';
+import { DoodlerModel } from '@/models/DoodlerModel';
+import { RoomModel } from '@/models/RoomModel';
 import { RoomInfoMapType } from '@/types/game';
 import { RoomInterface } from '@/types/socket/room';
 import { ErrorFromServer } from '@/utils/error';

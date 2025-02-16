@@ -1,5 +1,5 @@
-import GameModel from '@/models/Game';
-import { RoomModel } from '@/models/Room';
+import GameModel from '@/models/GameModel';
+import { RoomModel } from '@/models/RoomModel';
 
 export enum GameStatus {
   GAME = 'in_game',

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { RoomEvents } from '@/constants/events';
-import DoodlerServiceInstance from '@/services/doodler';
-import RoomServiceInstance from '@/services/room';
+import DoodlerServiceInstance from '@/services/DoodlerService';
+import RoomServiceInstance from '@/services/RoomService';
 
 import { RoomControllerInterface } from './interface';
 
