@@ -24,7 +24,7 @@ class SocketService implements SocketServiceInterface {
     this.io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
-      this.registerSocketEvents(socket);
+      this.registerSocketReservedEvents(socket);
       this.registerDoodlerEvents(socket);
       this.registerRoomEvents(socket);
       this.registerGameEvents(socket);
@@ -33,22 +33,24 @@ class SocketService implements SocketServiceInterface {
 
   // PRIVATE METHODS
   /**
-   * Register Incoming Socket Specific Events
+   * Register Socket RESERVED Events
    * @param socket
    */
-  private registerSocketEvents(socket: SocketType) {
-    socket.on(
+  private registerSocketReservedEvents(socket: SocketType) {
+    this.registerReservedEvent(
+      socket,
       SocketEvents.ON_DISCONNECTING,
       this.controller.handleSocketOnDisconnecting(socket)
     );
-    socket.on(
+    this.registerReservedEvent(
+      socket,
       SocketEvents.ON_DISCONNECT,
       this.controller.handleSocketOnDisconnect(socket)
     );
   }
 
   /**
-   * Register Incoming Member Specific Events
+   * Register Incoming Doodler Specific Events
    * @param socket
    */
   private registerDoodlerEvents(socket: SocketType) {
@@ -107,7 +109,7 @@ class SocketService implements SocketServiceInterface {
    * USE THIS CAREFULLY
    * INTENDED ONLY FOR CUSTOM EVENTS AND NOT FOR RESERVED EVENTS
    * @param socket Socket
-   * @param event Event Name
+   * @param event Custom Event Name
    * @param handler Event Handler
    */
   private registerCustomEvent(
@@ -117,16 +119,39 @@ class SocketService implements SocketServiceInterface {
     handler: any
   ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    socket.on(event, (...args: any) => {
+    socket.on(event, async (...args: any) => {
       const respond = args[1];
       try {
-        handler(...args);
+        await handler(...args);
       } catch (e) {
         if (e instanceof ErrorFromServer) {
           respond({ error: e });
         } else {
           console.error(e);
         }
+      }
+    });
+  }
+
+  /**
+   * USE THIS CAREFULLY
+   * INTENDED ONLY FOR RESERVED EVENTS AND NOT FOR CUSTOM EVENTS
+   * @param socket Socket
+   * @param event Reserved Event Name
+   * @param handler Event Handler
+   */
+  private registerReservedEvent(
+    socket: SocketType,
+    event: SocketEvents,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handler: any
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on(event, async (...args: any) => {
+      try {
+        await handler(...args);
+      } catch (e) {
+        console.error(e);
       }
     });
   }
