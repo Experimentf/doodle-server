@@ -15,8 +15,8 @@ export class RoomModel {
   public readonly capacity = DEFAULT_CAPACITY;
 
   // Private Variables
-  private ownerId?: string;
-  private gameId?: string;
+  private _ownerId?: string;
+  private _gameId?: string;
 
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
@@ -30,14 +30,14 @@ export class RoomModel {
       capacity: this.capacity,
       isPrivate: this.isPrivate,
       doodlers: this.doodlers,
-      ownerId: this.ownerId,
-      gameId: this.gameId
+      ownerId: this._ownerId,
+      gameId: this._gameId
     };
   }
 
   // Returns the current owner of the room
   public getOwnerId() {
-    return this.ownerId;
+    return this._ownerId;
   }
 
   // Add a new doodler to the room
@@ -68,13 +68,13 @@ export class RoomModel {
 
   // Set an onwer
   public setOwner(doodlerId?: string) {
-    this.ownerId = doodlerId;
+    this._ownerId = doodlerId;
     return true;
   }
 
   // Check if the doodler is an owner of this room
   public isOwner(doodlerId: string) {
-    return this.ownerId === doodlerId;
+    return this._ownerId === doodlerId;
   }
 
   // Returns if the room has no doodlers

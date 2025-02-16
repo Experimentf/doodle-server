@@ -13,7 +13,7 @@ interface GameServiceInterface {
 }
 
 export class GameService implements GameServiceInterface {
-  public gameDetailMap: GameInfoMapType = new Map<string, GameModel>(); // GAME ID -> GAME DETAILS
+  private _games: GameInfoMapType = new Map<string, GameModel>(); // GAME ID -> GAME DETAILS
 
   /**
    *
@@ -45,7 +45,7 @@ export class GameService implements GameServiceInterface {
    */
   public async createGame() {
     const newGame = new GameModel();
-    this.gameDetailMap.set(newGame.id, newGame);
+    this._games.set(newGame.id, newGame);
     const game = await this.findGame(newGame.id);
     return game;
   }
@@ -56,7 +56,7 @@ export class GameService implements GameServiceInterface {
    * @returns
    */
   public async findGame(gameId: string) {
-    const game = this.gameDetailMap.get(gameId);
+    const game = this._games.get(gameId);
     if (!game) throw new ErrorFromServer('Could not find game!');
     return { game: game.json };
   }

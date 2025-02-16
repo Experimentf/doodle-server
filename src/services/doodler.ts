@@ -16,7 +16,7 @@ interface DoodlerServiceInterface {
 }
 
 class DoodlerService implements DoodlerServiceInterface {
-  public readonly doodlers: Map<string, DoodlerModel> = new Map<
+  private readonly _doodlers: Map<string, DoodlerModel> = new Map<
     string,
     DoodlerModel
   >(); // DOODLER ID -> DOODLER DETAILS
@@ -33,7 +33,7 @@ class DoodlerService implements DoodlerServiceInterface {
   }) {
     const { id, name, avatar } = doodlerProps;
     const doodler = new DoodlerModel(id, name, avatar);
-    this.doodlers.set(id, doodler);
+    this._doodlers.set(id, doodler);
     return { doodlerId: doodler.id };
   }
 
@@ -43,7 +43,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @returns true | false
    */
   public async removeDoodler(doodlerId: string) {
-    return this.doodlers.delete(doodlerId);
+    return this._doodlers.delete(doodlerId);
   }
 
   /**
@@ -52,7 +52,7 @@ class DoodlerService implements DoodlerServiceInterface {
    * @returns Doodler
    */
   public async findDooder(doodlerId: string) {
-    const doodler = this.doodlers.get(doodlerId);
+    const doodler = this._doodlers.get(doodlerId);
     if (!doodler) throw new ErrorFromServer('Doodler not found!');
     return { doodler: doodler.json };
   }

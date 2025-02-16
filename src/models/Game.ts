@@ -8,8 +8,8 @@ import { generateId } from '@/utils/unique';
  */
 class GameModel {
   public readonly id: string;
-  private status: GameStatus = GameStatus.LOBBY;
-  private options: GameOptions = {
+  private _status: GameStatus = GameStatus.LOBBY;
+  private _options: GameOptions = {
     round: { current: 1, max: DEFAULT_MAX_ROUNDS },
     time: { current: 0, max: DEFAULT_MAX_TIME },
     word: ''
@@ -22,8 +22,8 @@ class GameModel {
   public get json() {
     return {
       id: this.id,
-      status: this.status,
-      options: this.options
+      status: this._status,
+      options: this._options
     };
   }
 }

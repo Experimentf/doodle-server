@@ -14,20 +14,20 @@ interface SocketServiceInterface {
 }
 
 class SocketService implements SocketServiceInterface {
-  private io?: IoType;
-  private controller = new Controller() as unknown as ControllerInterface;
+  private _io?: IoType;
+  private _controller = new Controller() as unknown as ControllerInterface;
 
   /**
    * Register Incoming Connections on IO
    */
   public start(io: IoType) {
-    this.io = io;
+    this._io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
-      this.registerSocketReservedEvents(socket);
-      this.registerDoodlerEvents(socket);
-      this.registerRoomEvents(socket);
-      this.registerGameEvents(socket);
+      this._registerSocketReservedEvents(socket);
+      this._registerDoodlerEvents(socket);
+      this._registerRoomEvents(socket);
+      this._registerGameEvents(socket);
     });
   }
 
@@ -36,16 +36,16 @@ class SocketService implements SocketServiceInterface {
    * Register Socket RESERVED Events
    * @param socket
    */
-  private registerSocketReservedEvents(socket: SocketType) {
-    this.registerReservedEvent(
+  private _registerSocketReservedEvents(socket: SocketType) {
+    this._registerReservedEvent(
       socket,
       SocketEvents.ON_DISCONNECTING,
-      this.controller.handleSocketOnDisconnecting(socket)
+      this._controller.handleSocketOnDisconnecting(socket)
     );
-    this.registerReservedEvent(
+    this._registerReservedEvent(
       socket,
       SocketEvents.ON_DISCONNECT,
-      this.controller.handleSocketOnDisconnect(socket)
+      this._controller.handleSocketOnDisconnect(socket)
     );
   }
 
@@ -53,16 +53,16 @@ class SocketService implements SocketServiceInterface {
    * Register Incoming Doodler Specific Events
    * @param socket
    */
-  private registerDoodlerEvents(socket: SocketType) {
-    this.registerCustomEvent(
+  private _registerDoodlerEvents(socket: SocketType) {
+    this._registerCustomEvent(
       socket,
       DoodlerEvents.ON_GET_DOODLER,
-      this.controller.handleDoodlerOnGet(socket)
+      this._controller.handleDoodlerOnGet(socket)
     );
-    this.registerCustomEvent(
+    this._registerCustomEvent(
       socket,
       DoodlerEvents.ON_SET_DOODLER,
-      this.controller.handleDoodlerOnSet(socket)
+      this._controller.handleDoodlerOnSet(socket)
     );
   }
 
@@ -70,26 +70,26 @@ class SocketService implements SocketServiceInterface {
    * Register Incoming Room Specific Events
    * @param socket
    */
-  private registerRoomEvents(socket: SocketType) {
-    this.registerCustomEvent(
+  private _registerRoomEvents(socket: SocketType) {
+    this._registerCustomEvent(
       socket,
       RoomEvents.ON_ADD_DOODLER_TO_PUBLIC_ROOM,
-      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket)
+      this._controller.handleRoomOnAddDoodlerToPublicRoom(socket)
     );
-    this.registerCustomEvent(
+    this._registerCustomEvent(
       socket,
       RoomEvents.ON_ADD_DOODLER_TO_PRIVATE_ROOM,
-      this.controller.handleRoomOnAddDoodlerToPublicRoom(socket)
+      this._controller.handleRoomOnAddDoodlerToPublicRoom(socket)
     );
-    this.registerCustomEvent(
+    this._registerCustomEvent(
       socket,
       RoomEvents.ON_CREATE_PRIVATE_ROOM,
-      this.controller.handleRoomOnCreatePrivateRoom(socket)
+      this._controller.handleRoomOnCreatePrivateRoom(socket)
     );
-    this.registerCustomEvent(
+    this._registerCustomEvent(
       socket,
       RoomEvents.ON_GET_ROOM,
-      this.controller.handleRoomOnGetRoom(socket)
+      this._controller.handleRoomOnGetRoom(socket)
     );
   }
 
@@ -97,11 +97,11 @@ class SocketService implements SocketServiceInterface {
    * Register Incoming Game Specific Events
    * @param socket
    */
-  private registerGameEvents(socket: SocketType) {
-    this.registerCustomEvent(
+  private _registerGameEvents(socket: SocketType) {
+    this._registerCustomEvent(
       socket,
       GameEvents.ON_GET_GAME,
-      this.controller.handleGameOnGetGame(socket)
+      this._controller.handleGameOnGetGame(socket)
     );
   }
 
@@ -112,7 +112,7 @@ class SocketService implements SocketServiceInterface {
    * @param event Custom Event Name
    * @param handler Event Handler
    */
-  private registerCustomEvent(
+  private _registerCustomEvent(
     socket: SocketType,
     event: keyof ClientToServerEvents,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,7 +140,7 @@ class SocketService implements SocketServiceInterface {
    * @param event Reserved Event Name
    * @param handler Event Handler
    */
-  private registerReservedEvent(
+  private _registerReservedEvent(
     socket: SocketType,
     event: SocketEvents,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
