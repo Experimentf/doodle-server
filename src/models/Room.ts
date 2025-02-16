@@ -3,6 +3,10 @@ import { generateId } from '@/utils/unique';
 
 import { DoodlerModel } from './Doodler';
 
+/**
+ * FOR USE INSIDE ROOM SERVICE ONLY
+ * TO SEND DATA TO CLIENT OR ANOTHER SERVICE, USE ROOM INTERFACE INSTEAD
+ */
 export class RoomModel {
   // Public Variables
   public readonly id: string;
@@ -29,11 +33,6 @@ export class RoomModel {
       ownerId: this.ownerId,
       gameId: this.gameId
     };
-  }
-
-  // Returns the current number of members
-  public get currentSize() {
-    return this.doodlers.length;
   }
 
   // Returns the current owner of the room
@@ -63,7 +62,7 @@ export class RoomModel {
 
   // Get a random doodler
   public get randomDoodlerId() {
-    const index = Math.round(Math.random() * (this.currentSize - 1));
+    const index = Math.round(Math.random() * (this.doodlers.length - 1));
     return this.doodlers[index];
   }
 

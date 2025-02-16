@@ -21,9 +21,7 @@ class RoomController implements RoomControllerInterface {
       socket.join(roomId);
 
       // Let other users in the room know
-      socket
-        .to(roomId)
-        .emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler: doodler.json });
+      socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler });
 
       respond({ data: { roomId } });
     };
@@ -50,11 +48,8 @@ class RoomController implements RoomControllerInterface {
         roomId,
         socket.id
       );
-      const getDoodlersData = await DoodlerServiceInstance.getDoodlers(
-        room.doodlers
-      );
-      const doodlers = getDoodlersData.map((d) => d.json);
-      respond({ data: { room: room.json, doodlers } });
+      const doodlers = await DoodlerServiceInstance.getDoodlers(room.doodlers);
+      respond({ data: { room, doodlers } });
     };
 }
 

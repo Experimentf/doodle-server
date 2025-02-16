@@ -1,14 +1,15 @@
 import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import GameModel from '@/models/Game';
 import { GameInfoMapType } from '@/types/game';
+import { GameInterface } from '@/types/socket/game';
 import { ErrorFromServer } from '@/utils/error';
 
 import RoomServiceInstance from './room';
 
 interface GameServiceInterface {
-  findGame: (gameId: string) => Promise<{ game: GameModel }>;
+  findGame: (gameId: string) => Promise<{ game: GameInterface }>;
   startGame: (gameId: string) => Promise<void>;
-  createGame: () => Promise<{ game: GameModel }>;
+  createGame: () => Promise<{ game: GameInterface }>;
 }
 
 export class GameService implements GameServiceInterface {
@@ -22,7 +23,7 @@ export class GameService implements GameServiceInterface {
   public static async isValidGame(roomId: string) {
     try {
       const { room } = await RoomServiceInstance.findRoom(roomId);
-      return room.currentSize >= MINIMUM_VALID_SIZE;
+      return room.doodlers.length >= MINIMUM_VALID_SIZE;
     } catch (e) {
       return false;
     }
@@ -45,8 +46,8 @@ export class GameService implements GameServiceInterface {
   public async createGame() {
     const newGame = new GameModel();
     this.gameDetailMap.set(newGame.id, newGame);
-    const data = await this.findGame(newGame.id);
-    return { game: data.game };
+    const game = await this.findGame(newGame.id);
+    return game;
   }
 
   /**
@@ -57,7 +58,7 @@ export class GameService implements GameServiceInterface {
   public async findGame(gameId: string) {
     const game = this.gameDetailMap.get(gameId);
     if (!game) throw new ErrorFromServer('Could not find game!');
-    return { game };
+    return { game: game.json };
   }
 }
 

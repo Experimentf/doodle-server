@@ -1,3 +1,7 @@
+/**
+ * FOR USE INSIDE DOODLER SERVICE ONLY
+ * TO SEND DATA TO CLIENT OR ANOTHER SERVICE, USE DOODLER INTERFACE INSTEAD
+ */
 export class DoodlerModel {
   public readonly id: string;
   public readonly name: string;

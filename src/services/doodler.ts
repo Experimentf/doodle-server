@@ -1,4 +1,5 @@
 import { DoodlerModel } from '@/models/Doodler';
+import { DoodlerInterface } from '@/types/socket/doodler';
 import { ErrorFromServer } from '@/utils/error';
 
 interface DoodlerServiceInterface {
@@ -10,8 +11,8 @@ interface DoodlerServiceInterface {
     doodlerId: string;
   }>;
   removeDoodler: (doodlerId: string) => Promise<boolean>;
-  findDooder: (doodlerId: string) => Promise<{ doodler: DoodlerModel }>;
-  getDoodlers: (doodlerIds: string[]) => Promise<DoodlerModel[]>;
+  findDooder: (doodlerId: string) => Promise<{ doodler: DoodlerInterface }>;
+  getDoodlers: (doodlerIds: string[]) => Promise<DoodlerInterface[]>;
 }
 
 class DoodlerService implements DoodlerServiceInterface {
@@ -53,7 +54,7 @@ class DoodlerService implements DoodlerServiceInterface {
   public async findDooder(doodlerId: string) {
     const doodler = this.doodlers.get(doodlerId);
     if (!doodler) throw new ErrorFromServer('Doodler not found!');
-    return { doodler };
+    return { doodler: doodler.json };
   }
 
   /**
@@ -65,8 +66,8 @@ class DoodlerService implements DoodlerServiceInterface {
     const resultLength = doodlerIds.length;
     const doodlers = await Promise.all(
       doodlerIds.map(async (id) => {
-        const data = await this.findDooder(id);
-        return data.doodler;
+        const { doodler } = await this.findDooder(id);
+        return doodler;
       })
     );
     if (doodlers.length !== resultLength) throw new ErrorFromServer();

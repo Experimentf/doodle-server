@@ -1,16 +1,17 @@
 import { DoodlerModel } from '@/models/Doodler';
 import { RoomModel } from '@/models/Room';
 import { RoomInfoMapType } from '@/types/game';
+import { RoomInterface } from '@/types/socket/room';
 import { ErrorFromServer } from '@/utils/error';
 
 interface RoomServiceInterface {
   createPublicRoom: () => Promise<{ roomId: string }>;
   createPrivateRoom: (ownerId: string) => Promise<{ roomId: string }>;
-  findRoom: (roomId: string) => Promise<{ room: RoomModel }>;
+  findRoom: (roomId: string) => Promise<{ room: RoomInterface }>;
   findRoomWithDoodler: (
     roomId: string,
     doodlerId: string
-  ) => Promise<{ room: RoomModel }>;
+  ) => Promise<{ room: RoomInterface }>;
   assignDoodlerToPublicRoom: (doodlerId: DoodlerModel['id']) => Promise<{
     roomId: string;
   }>;
@@ -49,7 +50,7 @@ class RoomService implements RoomServiceInterface {
   public async findRoom(roomId: string) {
     const room = this.rooms.get(roomId);
     if (!room) throw new ErrorFromServer('Room not found');
-    return { room };
+    return { room: room.json };
   }
 
   /**
@@ -101,7 +102,7 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   public async removeDoodlerFromRoom(roomId: string, doodlerId: string) {
-    const { room } = await this.findRoom(roomId);
+    const { room } = await this.findRoomModel(roomId);
     room.removeDoodler(doodlerId);
     if (room.isEmpty()) {
       await this.deleteRoom(roomId);
@@ -113,13 +114,24 @@ class RoomService implements RoomServiceInterface {
 
   // PRIVATE METHODS
   /**
+   * Find a room by room id
+   * @param roomId - Room ID of the room to be found
+   * @returns Room details
+   */
+  private async findRoomModel(roomId: string) {
+    const room = this.rooms.get(roomId);
+    if (!room) throw new ErrorFromServer('Room not found');
+    return { room: room };
+  }
+
+  /**
    * Add a doodler to a room
    * @param roomId Room ID of the room in which a doodler is to be added
    * @param doodler Doodler to be added to the room
    * @returns true if success, false if failure
    */
   private async addDoodlerToRoom(roomId: string, doodlerId: string) {
-    const { room } = await this.findRoom(roomId);
+    const { room } = await this.findRoomModel(roomId);
     const isAdded = room.addDoodler(doodlerId);
     return isAdded;
   }
@@ -141,7 +153,7 @@ class RoomService implements RoomServiceInterface {
    * @returns true for success, false for failure
    */
   private async selectNewOwner(roomId: string) {
-    const { room } = await this.findRoom(roomId);
+    const { room } = await this.findRoomModel(roomId);
     const isOwnerSet = room.setOwner(room.randomDoodlerId);
     return isOwnerSet;
   }

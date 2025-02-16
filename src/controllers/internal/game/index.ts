@@ -19,7 +19,7 @@ class GameController implements GameControllerInterface {
       //   GameServiceInstance.startGame(roomId);
       // }
 
-      respond({ data: { game: game.json } });
+      respond({ data: { game } });
     };
 }
 
