@@ -1,25 +1,51 @@
-import { DoodlerModel } from '@/models/DoodlerModel';
+import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import { RoomModel } from '@/models/RoomModel';
 import { RoomInfoMapType } from '@/types/game';
+import { DoodlerInterface } from '@/types/socket/doodler';
+import { GameInterface } from '@/types/socket/game';
 import { RoomInterface } from '@/types/socket/room';
 import { DoodleServerError } from '@/utils/error';
 
 interface RoomServiceInterface {
+  // FUNDAMENTALS
+  isValidGameRoom: (roomId: string) => Promise<boolean>;
   createPublicRoom: () => Promise<{ roomId: string }>;
   createPrivateRoom: (ownerId: string) => Promise<{ roomId: string }>;
   findRoom: (roomId: string) => Promise<{ room: RoomInterface }>;
+
+  // ROOM WITH DOODLER
   findRoomWithDoodler: (
     roomId: string,
     doodlerId: string
   ) => Promise<{ room: RoomInterface }>;
-  assignDoodlerToPublicRoom: (doodlerId: DoodlerModel['id']) => Promise<{
-    roomId: string;
-  }>;
+  assignDoodlerToPublicRoom: (
+    doodlerId: DoodlerInterface['id']
+  ) => Promise<RoomInterface>;
   removeDoodlerFromRoom: (roomId: string, doodlerId: string) => Promise<void>;
+
+  // ROOM WITH GAME
+  assignGameToRoom: (
+    roomId: string,
+    gameId: GameInterface['id']
+  ) => Promise<void>;
 }
 
 class RoomService implements RoomServiceInterface {
   private _rooms: RoomInfoMapType = new Map<string, RoomModel>(); // ROOM ID -> ROOM DETAILS
+
+  /**
+   *
+   * @param roomId RoomID to check validity for game
+   * @returns true if valid, false if invalid
+   */
+  public async isValidGameRoom(roomId: string) {
+    try {
+      const { room } = await this.findRoom(roomId);
+      return room.doodlers.length >= MINIMUM_VALID_SIZE;
+    } catch (e) {
+      return false;
+    }
+  }
 
   /**
    * Create a new public room
@@ -73,24 +99,25 @@ class RoomService implements RoomServiceInterface {
    * @returns
    */
   public async assignDoodlerToPublicRoom(doodlerId: string) {
-    let roomId: string | undefined = undefined;
+    let roomInterface: RoomInterface | undefined = undefined;
     // Assign doodler to the first available room
     for (const room of this._rooms.values()) {
       if (room.isPrivate) continue;
       const isDoodlerAdded = room.addDoodler(doodlerId);
       if (isDoodlerAdded) {
-        roomId = room.id;
+        roomInterface = room.json;
         break;
       }
     }
-    if (roomId !== undefined) return { roomId };
+    if (roomInterface !== undefined) return roomInterface;
 
     // Create a new public room if doodler could not be assigned
     const { roomId: newRoomId } = await this.createPublicRoom();
+    const { room: newRoomInterface } = await this.findRoom(newRoomId);
 
     // Assign doodler to the newly created room
     await this._addDoodlerToRoom(newRoomId, doodlerId);
-    return { roomId: newRoomId };
+    return newRoomInterface;
   }
 
   /**
@@ -110,6 +137,17 @@ class RoomService implements RoomServiceInterface {
     if (room.isOwner(doodlerId)) {
       await this._selectNewOwner(roomId);
     }
+  }
+
+  /**
+   *
+   * @param roomId
+   * @param gameId
+   * returns - void
+   */
+  public async assignGameToRoom(roomId: string, gameId: string) {
+    const { room } = await this._findRoomModel(roomId);
+    room.setGame(gameId);
   }
 
   // PRIVATE METHODS

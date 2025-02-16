@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { RoomEvents } from '@/constants/events';
+import { GameEvents, RoomEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/DoodlerService';
+import GameServiceInstance from '@/services/GameService';
 import RoomServiceInstance from '@/services/RoomService';
+import { GameStatus } from '@/types/game';
+import { GameInterface } from '@/types/socket/game';
 
 import { RoomControllerInterface } from './interface';
 
@@ -11,17 +14,35 @@ class RoomController implements RoomControllerInterface {
    */
   public handleRoomOnAddDoodlerToPublicRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPublicRoom'] =
     (socket) => async (_payload, respond) => {
-      const doodlerData = await DoodlerServiceInstance.findDooder(socket.id);
-      const { doodler } = doodlerData;
-      const { roomId } = await RoomServiceInstance.assignDoodlerToPublicRoom(
-        doodler.id
-      );
+      const { doodler } = await DoodlerServiceInstance.findDooder(socket.id);
+      const { id: roomId, gameId } =
+        await RoomServiceInstance.assignDoodlerToPublicRoom(doodler.id);
 
       // Join the new room
       socket.join(roomId);
 
       // Let other users in the room know
       socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_JOIN, { doodler });
+
+      let game: GameInterface | undefined = undefined;
+      if (!gameId) {
+        const { game: gameInterface } = await GameServiceInstance.createGame();
+        await RoomServiceInstance.assignGameToRoom(roomId, gameInterface.id);
+        game = gameInterface;
+      } else {
+        const { game: gameInterface } =
+          await GameServiceInstance.findGame(gameId);
+        game = gameInterface;
+      }
+
+      const isValidGameRoom = await RoomServiceInstance.isValidGameRoom(roomId);
+      if (!gameId || !isValidGameRoom) {
+        await GameServiceInstance.moveToLobby(game.id);
+        socket.emit(GameEvents.EMIT_GAME_LOBBY);
+      } else if (game.status === GameStatus.LOBBY && isValidGameRoom) {
+        await GameServiceInstance.moveToGame(game.id);
+        socket.emit(GameEvents.EMIT_GAME_START);
+      }
 
       respond({ data: { roomId } });
     };

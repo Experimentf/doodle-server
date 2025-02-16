@@ -76,6 +76,10 @@ export class RoomModel {
     return this._ownerId === doodlerId;
   }
 
+  public setGame(gameId?: string) {
+    this._gameId = gameId;
+  }
+
   // Returns if the room has no doodlers
   public isEmpty() {
     return this.doodlers.length === 0;

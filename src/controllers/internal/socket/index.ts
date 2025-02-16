@@ -1,6 +1,5 @@
 import { GameEvents, RoomEvents } from '@/constants/events';
 import DoodlerServiceInstance from '@/services/DoodlerService';
-import { GameService } from '@/services/GameService';
 import RoomServiceInstance from '@/services/RoomService';
 
 import { SocketControllerInterface } from './interface';
@@ -20,8 +19,9 @@ class SocketController implements SocketControllerInterface {
           socket.to(roomId).emit(RoomEvents.EMIT_DOODLER_LEAVE, {
             doodlerId
           });
-          const isValidGame = await GameService.isValidGame(roomId);
-          if (!isValidGame) {
+          const isValidGameRoom =
+            await RoomServiceInstance.isValidGameRoom(roomId);
+          if (!isValidGameRoom) {
             socket.to(roomId).emit(GameEvents.EMIT_GAME_LOBBY);
           }
         })

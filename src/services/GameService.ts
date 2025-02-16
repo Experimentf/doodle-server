@@ -1,33 +1,21 @@
-import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import GameModel from '@/models/GameModel';
-import { GameInfoMapType } from '@/types/game';
+import { GameInfoMapType, GameOptions, GameStatus } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
 
-import RoomServiceInstance from './RoomService';
-
 interface GameServiceInterface {
+  // FUNDAMENTALS
   findGame: (gameId: string) => Promise<{ game: GameInterface }>;
   startGame: (gameId: string) => Promise<void>;
   createGame: () => Promise<{ game: GameInterface }>;
+
+  // GAME
+  moveToLobby: (gameId: string) => Promise<void>;
+  moveToGame: (gameId: string) => Promise<void>;
 }
 
-export class GameService implements GameServiceInterface {
+class GameService implements GameServiceInterface {
   private _games: GameInfoMapType = new Map<string, GameModel>(); // GAME ID -> GAME DETAILS
-
-  /**
-   *
-   * @param roomId RoomID to check validity for game
-   * @returns true if valid, false if invalid
-   */
-  public static async isValidGame(roomId: string) {
-    try {
-      const { room } = await RoomServiceInstance.findRoom(roomId);
-      return room.doodlers.length >= MINIMUM_VALID_SIZE;
-    } catch (e) {
-      return false;
-    }
-  }
 
   /**
    *
@@ -43,8 +31,8 @@ export class GameService implements GameServiceInterface {
    *
    * @returns id - New game's id
    */
-  public async createGame() {
-    const newGame = new GameModel();
+  public async createGame(options?: Partial<GameOptions>) {
+    const newGame = new GameModel(options);
     this._games.set(newGame.id, newGame);
     const game = await this.findGame(newGame.id);
     return game;
@@ -59,6 +47,41 @@ export class GameService implements GameServiceInterface {
     const game = this._games.get(gameId);
     if (!game) throw new DoodleServerError('Could not find game!');
     return { game: game.json };
+  }
+
+  /**
+   *
+   * @param gameId - Game that needs to be moved to lobby
+   */
+  public async moveToLobby(gameId: string) {
+    const { game } = await this._findGameModel(gameId);
+    game.updateStatus(GameStatus.LOBBY);
+  }
+
+  /**
+   *
+   * @param gameId - Game that needs to be moved to game
+   */
+  public async moveToGame(gameId: string) {
+    const { game } = await this._findGameModel(gameId);
+    game.updateStatus(GameStatus.GAME);
+  }
+
+  // PRIVATE METHODS
+  private async _findGameModel(gameId: string) {
+    const game = this._games.get(gameId);
+    if (!game) throw new DoodleServerError('Could not find game!');
+    return { game };
+  }
+
+  /**
+   *
+   * @param gameId - Game ID
+   * @param status - The new status
+   */
+  private async _updateStatus(gameId: string, status: GameStatus) {
+    const { game } = await this._findGameModel(gameId);
+    game.updateStatus(status);
   }
 }
 

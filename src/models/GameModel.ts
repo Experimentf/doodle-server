@@ -1,4 +1,4 @@
-import { DEFAULT_MAX_ROUNDS, DEFAULT_MAX_TIME } from '@/constants/game';
+import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
 import { GameOptions, GameStatus } from '@/types/game';
 import { generateId } from '@/utils/unique';
 
@@ -9,14 +9,15 @@ import { generateId } from '@/utils/unique';
 class GameModel {
   public readonly id: string;
   private _status: GameStatus = GameStatus.LOBBY;
-  private _options: GameOptions = {
-    round: { current: 1, max: DEFAULT_MAX_ROUNDS },
-    time: { current: 0, max: DEFAULT_MAX_TIME },
-    word: ''
-  };
+  private _options: GameOptions = DEFAULT_GAME_OPTIONS;
 
-  constructor() {
+  constructor(options?: Partial<GameOptions>) {
     this.id = generateId();
+    this._options = this._createOptions(options);
+  }
+
+  public updateStatus(status: GameStatus) {
+    this._status = status;
   }
 
   public get json() {
@@ -25,6 +26,14 @@ class GameModel {
       status: this._status,
       options: this._options
     };
+  }
+
+  // PRIVATE METHODS
+  private _createOptions(options?: Partial<GameOptions>) {
+    const newOptions: GameOptions = DEFAULT_GAME_OPTIONS;
+    if (options?.round?.max) newOptions.round.max = options.round.max;
+    if (options?.time?.max) newOptions.time.max = options.time.max;
+    return newOptions;
   }
 }
 
