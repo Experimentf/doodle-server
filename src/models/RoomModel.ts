@@ -80,9 +80,17 @@ export class RoomModel {
     const index = this.doodlers.findIndex((id) => id === this._drawerId);
     let newIndex = index + 1;
     if (index === -1 || index === this.doodlers.length - 1) newIndex = 0;
-    this._drawerId = this.doodlers[newIndex];
+    this.setDrawerId(this.doodlers[newIndex]);
     return this._drawerId;
   }
+
+  // Get the current drawer id
+  public getDrawerId = () => this._drawerId;
+
+  // Set drawer id
+  public setDrawerId = (drawerId?: string) => {
+    this._drawerId = drawerId;
+  };
 
   public get json() {
     return {

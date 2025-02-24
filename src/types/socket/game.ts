@@ -18,5 +18,7 @@ export interface GameServerToClientEvents {
     drawerId: DoodlerInterface['id'];
   }) => void;
   [GameSocketEvents.EMIT_GAME_LOBBY]: () => void;
-  [GameSocketEvents.EMIT_GAME_END]: () => void;
+  [GameSocketEvents.EMIT_GAME_END]: (args: {
+    drawerId: DoodlerInterface['id'] | undefined;
+  }) => void;
 }

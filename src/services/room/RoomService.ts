@@ -126,9 +126,16 @@ class RoomService implements RoomServiceInterface {
     room.setGame(gameId);
   }
 
-  public async changeDrawerTurn(roomId: string) {
+  /**
+   *
+   * @param roomId
+   * @returns
+   */
+  public async changeDrawerTurn(roomId: string, remove = false) {
     const { room } = await this._findRoomModel(roomId);
-    return room.nextTurn();
+    if (!remove) return room.nextTurn();
+    room.setDrawerId(undefined);
+    return room.getDrawerId();
   }
 
   // PRIVATE METHODS

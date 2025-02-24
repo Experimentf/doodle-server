@@ -11,7 +11,7 @@ class SocketController implements SocketControllerInterface {
   public handleSocketOnDisconnecting: SocketControllerInterface['handleSocketOnDisconnecting'] =
     (socket) => async () => {
       const roomIds: string[] = [];
-      socket.rooms.forEach((id) => id != socket.id && roomIds.push(id));
+      socket.rooms.forEach((id) => id !== socket.id && roomIds.push(id));
       Promise.all(
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
@@ -22,7 +22,9 @@ class SocketController implements SocketControllerInterface {
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
           if (!isValidGameRoom) {
-            socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_LOBBY);
+            socket
+              .to(roomId)
+              .emit(GameSocketEvents.EMIT_GAME_END, { drawerId: undefined });
           }
         })
       ).finally(async () => {

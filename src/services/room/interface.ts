@@ -24,5 +24,7 @@ export interface RoomServiceInterface {
     roomId: string,
     gameId: GameInterface['id']
   ) => Promise<void>;
-  changeDrawerTurn: (roomId: string) => Promise<DoodlerInterface['id']>;
+  changeDrawerTurn: (
+    roomId: string
+  ) => Promise<DoodlerInterface['id'] | undefined>;
 }
