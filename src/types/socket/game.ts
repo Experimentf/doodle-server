@@ -1,8 +1,8 @@
 import { GameSocketEvents } from '@/constants/events/socket';
 import GameModel from '@/models/GameModel';
 
-import { DoodlerInterface } from './doodler';
 import { ClientToServerEventsArgument } from './helper';
+import { RoomInterface } from './room';
 
 export type GameInterface = GameModel['json'];
 
@@ -14,11 +14,8 @@ export interface GameClientToServerEventsArgumentMap {
 }
 
 export interface GameServerToClientEvents {
-  [GameSocketEvents.EMIT_GAME_START]: (args: {
-    drawerId: DoodlerInterface['id'];
+  [GameSocketEvents.EMIT_GAME_STATUS_UPDATED]: (args: {
+    room: RoomInterface;
+    game?: GameInterface;
   }) => void;
-  [GameSocketEvents.EMIT_GAME_LOBBY]: (args: {
-    drawerId: DoodlerInterface['id'] | undefined;
-  }) => void;
-  [GameSocketEvents.EMIT_GAME_END]: (args: { drawerId: undefined }) => void;
 }

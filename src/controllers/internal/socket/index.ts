@@ -30,12 +30,15 @@ class SocketController implements SocketControllerInterface {
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
           if (!isValidGameRoom && room) {
-            const { gameId } = await RoomServiceInstance.findRoom(roomId);
-            if (gameId)
-              await GameServiceInstance.updateStatus(gameId, GameStatus.LOBBY);
+            const game = !room.gameId
+              ? undefined
+              : await GameServiceInstance.updateStatus(
+                  room.gameId,
+                  GameStatus.LOBBY
+                );
             socket
               .to(roomId)
-              .emit(GameSocketEvents.EMIT_GAME_LOBBY, { drawerId: undefined });
+              .emit(GameSocketEvents.EMIT_GAME_STATUS_UPDATED, { room, game });
           }
         })
       ).finally(async () => {
