@@ -5,26 +5,25 @@ import { RoomInterface } from '@/types/socket/room';
 export interface RoomServiceInterface {
   // FUNDAMENTALS
   isValidGameRoom: (roomId: string) => Promise<boolean>;
-  createPublicRoom: () => Promise<{ roomId: string }>;
-  createPrivateRoom: (ownerId: string) => Promise<{ roomId: string }>;
-  findRoom: (roomId: string) => Promise<{ room: RoomInterface }>;
+  findRoom: (roomId: string) => Promise<RoomInterface>;
 
   // ROOM WITH DOODLER
   findRoomWithDoodler: (
     roomId: string,
     doodlerId: string
-  ) => Promise<{ room: RoomInterface }>;
+  ) => Promise<RoomInterface>;
   assignDoodlerToPublicRoom: (
     doodlerId: DoodlerInterface['id']
   ) => Promise<RoomInterface>;
-  removeDoodlerFromRoom: (roomId: string, doodlerId: string) => Promise<void>;
+  removeDoodlerFromRoom: (
+    roomId: string,
+    doodlerId: string
+  ) => Promise<RoomInterface | undefined>;
 
   // ROOM WITH GAME
   assignGameToRoom: (
     roomId: string,
     gameId: GameInterface['id']
-  ) => Promise<void>;
-  changeDrawerTurn: (
-    roomId: string
-  ) => Promise<DoodlerInterface['id'] | undefined>;
+  ) => Promise<RoomInterface>;
+  changeDrawerTurn: (roomId: string) => Promise<RoomInterface>;
 }

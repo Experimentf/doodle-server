@@ -26,9 +26,7 @@ class SocketController implements SocketControllerInterface {
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
           if (!isValidGameRoom) {
-            const {
-              room: { gameId }
-            } = await RoomServiceInstance.findRoom(roomId);
+            const { gameId } = await RoomServiceInstance.findRoom(roomId);
             if (gameId) await GameServiceInstance.moveToLobby(gameId);
             socket
               .to(roomId)

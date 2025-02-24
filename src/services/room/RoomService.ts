@@ -16,32 +16,11 @@ class RoomService implements RoomServiceInterface {
    */
   public async isValidGameRoom(roomId: string) {
     try {
-      const { room } = await this.findRoom(roomId);
+      const room = await this.findRoom(roomId);
       return room.doodlers.length >= MINIMUM_VALID_SIZE;
     } catch (e) {
       return false;
     }
-  }
-
-  /**
-   * Create a new public room
-   * @returns Room ID of the newly created room
-   */
-  public async createPublicRoom() {
-    const room = new RoomModel();
-    this._rooms.set(room.id, room);
-    return { roomId: room.id };
-  }
-
-  /**
-   * Create a new private room
-   * @param ownerId - Doodler ID who is the owner of this new room
-   * @returns Room ID of the newly created room
-   */
-  public async createPrivateRoom(ownerId: string) {
-    const room = new RoomModel(ownerId);
-    this._rooms.set(room.id, room);
-    return { roomId: room.id };
   }
 
   /**
@@ -52,7 +31,7 @@ class RoomService implements RoomServiceInterface {
   public async findRoom(roomId: string) {
     const room = this._rooms.get(roomId);
     if (!room) throw new DoodleServerError('Room not found');
-    return { room: room.json };
+    return room.json;
   }
 
   /**
@@ -62,11 +41,10 @@ class RoomService implements RoomServiceInterface {
    * @returns Room details
    */
   public async findRoomWithDoodler(roomId: string, doodlerId: string) {
-    const data = await this.findRoom(roomId);
-    const { room } = data;
+    const room = await this.findRoom(roomId);
     const doodler = room.doodlers.find((id) => id === doodlerId);
     if (!doodler) throw new DoodleServerError('Invalid Room ID!');
-    return { room };
+    return room;
   }
 
   /**
@@ -88,12 +66,11 @@ class RoomService implements RoomServiceInterface {
     if (roomInterface !== undefined) return roomInterface;
 
     // Create a new public room if doodler could not be assigned
-    const { roomId: newRoomId } = await this.createPublicRoom();
-    const { room: newRoomInterface } = await this.findRoom(newRoomId);
+    const roomModel = await this._createRoom();
 
     // Assign doodler to the newly created room
-    await this._addDoodlerToRoom(newRoomId, doodlerId);
-    return newRoomInterface;
+    await this._addDoodlerToRoom(roomModel.id, doodlerId);
+    return roomModel.json;
   }
 
   /**
@@ -105,14 +82,16 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   public async removeDoodlerFromRoom(roomId: string, doodlerId: string) {
-    const { room } = await this._findRoomModel(roomId);
-    room.removeDoodler(doodlerId);
-    if (room.isEmpty()) {
+    const roomModel = await this._findRoomModel(roomId);
+    roomModel.removeDoodler(doodlerId);
+    if (roomModel.isEmpty()) {
       await this._deleteRoom(roomId);
+      return undefined;
     }
-    if (room.isOwner(doodlerId)) {
+    if (roomModel.isOwner(doodlerId)) {
       await this._selectNewOwner(roomId);
     }
+    return roomModel.json;
   }
 
   /**
@@ -122,8 +101,9 @@ class RoomService implements RoomServiceInterface {
    * returns - void
    */
   public async assignGameToRoom(roomId: string, gameId: string) {
-    const { room } = await this._findRoomModel(roomId);
-    room.setGameId(gameId);
+    const roomModel = await this._findRoomModel(roomId);
+    roomModel.setGameId(gameId);
+    return roomModel.json;
   }
 
   /**
@@ -132,22 +112,33 @@ class RoomService implements RoomServiceInterface {
    * @returns
    */
   public async changeDrawerTurn(roomId: string, remove = false) {
-    const { room } = await this._findRoomModel(roomId);
-    const nextDrawerId = remove ? undefined : room.nextDrawerId;
-    room.setDrawerId(nextDrawerId);
-    return room.drawerId;
+    const roomModel = await this._findRoomModel(roomId);
+    const nextDrawerId = remove ? undefined : roomModel.nextDrawerId;
+    roomModel.setDrawerId(nextDrawerId);
+    return roomModel.json;
   }
 
   // PRIVATE METHODS
+  /**
+   * Create a new room
+   * @param ownerId - Doodler ID who is the owner of this new room. If undefined, the room will be public.
+   * @returns Room ID of the newly created room
+   */
+  private async _createRoom(ownerId?: string) {
+    const room = new RoomModel(ownerId);
+    this._rooms.set(room.id, room);
+    return room;
+  }
+
   /**
    * Find a room by room id
    * @param roomId - Room ID of the room to be found
    * @returns Room details
    */
   private async _findRoomModel(roomId: string) {
-    const room = this._rooms.get(roomId);
-    if (!room) throw new DoodleServerError('Room not found');
-    return { room: room };
+    const roomModel = this._rooms.get(roomId);
+    if (!roomModel) throw new DoodleServerError('Room not found');
+    return roomModel;
   }
 
   /**
@@ -157,8 +148,8 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   private async _addDoodlerToRoom(roomId: string, doodlerId: string) {
-    const { room } = await this._findRoomModel(roomId);
-    const isAdded = room.addDoodler(doodlerId);
+    const roomModel = await this._findRoomModel(roomId);
+    const isAdded = roomModel.addDoodler(doodlerId);
     return isAdded;
   }
 
@@ -168,8 +159,8 @@ class RoomService implements RoomServiceInterface {
    * @returns true if success, false if failure
    */
   private async _deleteRoom(roomId: string) {
-    const data = await this.findRoom(roomId);
-    const isDeleted = this._rooms.delete(data.room.id);
+    const room = await this.findRoom(roomId);
+    const isDeleted = this._rooms.delete(room.id);
     return isDeleted;
   }
 
@@ -179,8 +170,10 @@ class RoomService implements RoomServiceInterface {
    * @returns true for success, false for failure
    */
   private async _selectNewOwner(roomId: string) {
-    const { room } = await this._findRoomModel(roomId);
-    room.setOwnerId(room.randomDoodlerId);
+    const roomModel = await this._findRoomModel(roomId);
+    const newOwnerId = roomModel.randomDoodlerId;
+    roomModel.setOwnerId(newOwnerId);
+    return newOwnerId;
   }
 
   /**
@@ -195,8 +188,8 @@ class RoomService implements RoomServiceInterface {
     }
     const randomRoomIndex = Math.round(Math.random() * (nRooms - 1));
     const id = roomIdsArray[randomRoomIndex];
-    const findRoomData = await this.findRoom(id);
-    return { roomId: findRoomData.room.id };
+    const room = await this.findRoom(id);
+    return { roomId: room.id };
   }
 }
 
