@@ -2,6 +2,7 @@ import { GameSocketEvents, RoomSocketEvents } from '@/constants/events/socket';
 import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
 import GameServiceInstance from '@/services/game/GameService';
 import RoomServiceInstance from '@/services/room/RoomService';
+import { GameStatus } from '@/types/game';
 
 import { SocketControllerInterface } from './interface';
 
@@ -27,7 +28,8 @@ class SocketController implements SocketControllerInterface {
             await RoomServiceInstance.isValidGameRoom(roomId);
           if (!isValidGameRoom) {
             const { gameId } = await RoomServiceInstance.findRoom(roomId);
-            if (gameId) await GameServiceInstance.moveToLobby(gameId);
+            if (gameId)
+              await GameServiceInstance.updateStatus(gameId, GameStatus.LOBBY);
             socket
               .to(roomId)
               .emit(GameSocketEvents.EMIT_GAME_LOBBY, { drawerId: undefined });

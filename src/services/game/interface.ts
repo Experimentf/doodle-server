@@ -1,13 +1,12 @@
+import { GameStatus } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
 
 export interface GameServiceInterface {
   // FUNDAMENTALS
-  findGame: (gameId: string) => Promise<{ game: GameInterface }>;
+  findGame: (gameId: string) => Promise<GameInterface>;
   startGame: (gameId: string) => Promise<void>;
-  createGame: () => Promise<{ game: GameInterface }>;
+  createGame: () => Promise<GameInterface>;
 
   // GAME
-  moveToLobby: (gameId: string) => Promise<void>;
-  moveToGame: (gameId: string) => Promise<void>;
-  moveToEnd: (gameId: string) => Promise<void>;
+  updateStatus: (gameId: string, status: GameStatus) => Promise<GameInterface>;
 }

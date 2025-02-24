@@ -34,43 +34,27 @@ class GameService implements GameServiceInterface {
    * @returns
    */
   public async findGame(gameId: string) {
-    const game = this._games.get(gameId);
-    if (!game) throw new DoodleServerError('Could not find game!');
-    return { game: game.json };
+    const gameModel = this._games.get(gameId);
+    if (!gameModel) throw new DoodleServerError('Could not find game!');
+    return gameModel.json;
   }
 
   /**
    *
    * @param gameId - Game that needs to be moved to lobby
+   * @param status - New status of the game
    */
-  public async moveToLobby(gameId: string) {
-    const { game } = await this._findGameModel(gameId);
-    game.setStatus(GameStatus.LOBBY);
-  }
-
-  /**
-   *
-   * @param gameId - Game that needs to be moved to game
-   */
-  public async moveToGame(gameId: string) {
-    const { game } = await this._findGameModel(gameId);
-    game.setStatus(GameStatus.GAME);
-  }
-
-  /**
-   *
-   * @param gameId - Game that needs to be moved to game
-   */
-  public async moveToEnd(gameId: string) {
-    const { game } = await this._findGameModel(gameId);
-    game.setStatus(GameStatus.END);
+  public async updateStatus(gameId: string, status: GameStatus) {
+    const gameModel = await this._findGameModel(gameId);
+    gameModel.setStatus(status);
+    return gameModel.json;
   }
 
   // PRIVATE METHODS
   private async _findGameModel(gameId: string) {
-    const game = this._games.get(gameId);
-    if (!game) throw new DoodleServerError('Could not find game!');
-    return { game };
+    const gameModel = this._games.get(gameId);
+    if (!gameModel) throw new DoodleServerError('Could not find game!');
+    return gameModel;
   }
 
   /**
@@ -79,8 +63,8 @@ class GameService implements GameServiceInterface {
    * @param status - The new status
    */
   private async _setStatus(gameId: string, status: GameStatus) {
-    const { game } = await this._findGameModel(gameId);
-    game.setStatus(status);
+    const gameModel = await this._findGameModel(gameId);
+    gameModel.setStatus(status);
   }
 }
 
