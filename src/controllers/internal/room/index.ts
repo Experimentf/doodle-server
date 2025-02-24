@@ -38,7 +38,11 @@ class RoomController implements RoomControllerInterface {
       const isValidGameRoom = await RoomServiceInstance.isValidGameRoom(roomId);
       if (!gameId || !isValidGameRoom) {
         await GameServiceInstance.moveToLobby(game.id);
-        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_LOBBY);
+        const drawerId = await RoomServiceInstance.changeDrawerTurn(
+          roomId,
+          true
+        );
+        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_LOBBY, { drawerId });
       } else if (game.status === GameStatus.LOBBY && isValidGameRoom) {
         await GameServiceInstance.moveToGame(game.id);
         const drawerId = await RoomServiceInstance.changeDrawerTurn(roomId);
