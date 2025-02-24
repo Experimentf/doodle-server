@@ -14,7 +14,7 @@ class RoomController implements RoomControllerInterface {
    */
   public handleRoomOnAddDoodlerToPublicRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPublicRoom'] =
     (socket) => async (_payload, respond) => {
-      const { doodler } = await DoodlerServiceInstance.findDooder(socket.id);
+      const doodler = await DoodlerServiceInstance.findDooder(socket.id);
       const { id: roomId, gameId } =
         await RoomServiceInstance.assignDoodlerToPublicRoom(doodler.id);
 

@@ -10,8 +10,7 @@ class DoodlerController implements DoodlerControllerInterface {
    */
   public handleDoodlerOnGet: DoodlerControllerInterface['handleDoodlerOnGet'] =
     (socket) => async (_payload, respond) => {
-      const data = await DoodlerServiceInstance.findDooder(socket.id);
-      const { doodler } = data;
+      const doodler = await DoodlerServiceInstance.findDooder(socket.id);
       respond({ data: doodler });
     };
 
@@ -23,11 +22,11 @@ class DoodlerController implements DoodlerControllerInterface {
   public handleDoodlerOnSet: DoodlerControllerInterface['handleDoodlerOnSet'] =
     (socket) => async (payload, respond) => {
       const doodler = payload;
-      const data = await DoodlerServiceInstance.addDoodler({
+      const addedDoodler = await DoodlerServiceInstance.addDoodler({
         id: socket.id,
         ...doodler
       });
-      respond({ data: { id: data.doodlerId } });
+      respond({ data: { id: addedDoodler.id } });
     };
 }
 

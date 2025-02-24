@@ -5,10 +5,8 @@ export interface DoodlerServiceInterface {
     id: string;
     name: string;
     avatar: object;
-  }) => Promise<{
-    doodlerId: string;
-  }>;
+  }) => Promise<DoodlerInterface>;
   removeDoodler: (doodlerId: string) => Promise<boolean>;
-  findDooder: (doodlerId: string) => Promise<{ doodler: DoodlerInterface }>;
+  findDooder: (doodlerId: string) => Promise<DoodlerInterface>;
   getDoodlers: (doodlerIds: string[]) => Promise<DoodlerInterface[]>;
 }

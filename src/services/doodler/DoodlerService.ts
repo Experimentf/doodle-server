@@ -20,9 +20,9 @@ class DoodlerService implements DoodlerServiceInterface {
     avatar: object;
   }) {
     const { id, name, avatar } = doodlerProps;
-    const doodler = new DoodlerModel(id, name, avatar);
-    this._doodlers.set(id, doodler);
-    return { doodlerId: doodler.id };
+    const doodlerModel = new DoodlerModel(id, name, avatar);
+    this._doodlers.set(id, doodlerModel);
+    return doodlerModel.json;
   }
 
   /**
@@ -40,9 +40,9 @@ class DoodlerService implements DoodlerServiceInterface {
    * @returns Doodler
    */
   public async findDooder(doodlerId: string) {
-    const doodler = this._doodlers.get(doodlerId);
-    if (!doodler) throw new DoodleServerError('Doodler not found!');
-    return { doodler: doodler.json };
+    const doodlerModel = this._doodlers.get(doodlerId);
+    if (!doodlerModel) throw new DoodleServerError('Doodler not found!');
+    return doodlerModel.json;
   }
 
   /**
@@ -54,7 +54,7 @@ class DoodlerService implements DoodlerServiceInterface {
     const resultLength = doodlerIds.length;
     const doodlers = await Promise.all(
       doodlerIds.map(async (id) => {
-        const { doodler } = await this.findDooder(id);
+        const doodler = await this.findDooder(id);
         return doodler;
       })
     );
