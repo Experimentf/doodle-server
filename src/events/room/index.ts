@@ -1,6 +1,9 @@
-import EventEmitter from 'events';
+import { RoomCustomEventHandlerMap } from '@/constants/events/custom/room';
 
-class RoomEmitter extends EventEmitter {}
+import { ServerEventManager } from '../utils/ServerEventManager';
 
-const RoomEmitterInstance = new RoomEmitter();
-export default RoomEmitterInstance;
+class RoomEventManager extends ServerEventManager<RoomCustomEventHandlerMap> {}
+
+const RoomEventManagerInstance = new RoomEventManager();
+
+export default RoomEventManagerInstance;

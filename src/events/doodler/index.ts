@@ -1,6 +1,9 @@
-import EventEmitter from 'events';
+import { DoodlerCustomEventHandlerMap } from '@/constants/events/custom/doodler';
 
-class DoodlerEmitter extends EventEmitter {}
+import { ServerEventManager } from '../utils/ServerEventManager';
 
-const DoodlerEmitterInstance = new DoodlerEmitter();
-export default DoodlerEmitterInstance;
+class DoodlerEventManager extends ServerEventManager<DoodlerCustomEventHandlerMap> {}
+
+const DoodlerEventManagerInstance = new DoodlerEventManager();
+
+export default DoodlerEventManagerInstance;
