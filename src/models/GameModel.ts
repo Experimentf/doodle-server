@@ -16,10 +16,25 @@ class GameModel {
     this._options = this._createOptions(options);
   }
 
-  public updateStatus(status: GameStatus) {
+  // Options
+  public get options() {
+    return this._options;
+  }
+
+  public setOptions(options: Partial<GameOptions>) {
+    this._options = this._createOptions(options);
+  }
+
+  // Status
+  public get status() {
+    return this._status;
+  }
+
+  public setStatus(status: GameStatus) {
     this._status = status;
   }
 
+  // Doodler Interface
   public get json() {
     return {
       id: this.id,

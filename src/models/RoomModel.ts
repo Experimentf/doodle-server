@@ -21,13 +21,35 @@ export class RoomModel {
   constructor(ownerId?: string) {
     this.id = generateId(); // TODO: handle collision
     this.isPrivate = ownerId !== undefined;
-    this.setOwner(ownerId);
+    this.setOwnerId(ownerId);
   }
 
-  // Returns the current owner of the room
-  public getOwnerId() {
+  // Owner Id
+  public get ownerId() {
     return this._ownerId;
   }
+
+  public setOwnerId(doodlerId?: string) {
+    this._ownerId = doodlerId;
+  }
+
+  // Game Id
+  public get gameId() {
+    return this._gameId;
+  }
+
+  public setGameId(gameId?: string) {
+    this._gameId = gameId;
+  }
+
+  // Drawer Id
+  public get drawerId() {
+    return this._drawerId;
+  }
+
+  public setDrawerId = (drawerId?: string) => {
+    this._drawerId = drawerId;
+  };
 
   // Add a new doodler to the room
   public addDoodler(doodlerId: string) {
@@ -55,19 +77,9 @@ export class RoomModel {
     return this.doodlers[index];
   }
 
-  // Set an onwer
-  public setOwner(doodlerId?: string) {
-    this._ownerId = doodlerId;
-    return true;
-  }
-
   // Check if the doodler is an owner of this room
   public isOwner(doodlerId: string) {
     return this._ownerId === doodlerId;
-  }
-
-  public setGame(gameId?: string) {
-    this._gameId = gameId;
   }
 
   // Returns if the room has no doodlers
@@ -76,21 +88,12 @@ export class RoomModel {
   }
 
   // Move the drawer to the next doodler
-  public nextTurn() {
+  public get nextDrawerId() {
     const index = this.doodlers.findIndex((id) => id === this._drawerId);
     let newIndex = index + 1;
     if (index === -1 || index === this.doodlers.length - 1) newIndex = 0;
-    this.setDrawerId(this.doodlers[newIndex]);
-    return this._drawerId;
+    return this.doodlers[newIndex];
   }
-
-  // Get the current drawer id
-  public getDrawerId = () => this._drawerId;
-
-  // Set drawer id
-  public setDrawerId = (drawerId?: string) => {
-    this._drawerId = drawerId;
-  };
 
   public get json() {
     return {

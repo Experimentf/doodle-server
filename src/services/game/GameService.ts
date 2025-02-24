@@ -45,7 +45,7 @@ class GameService implements GameServiceInterface {
    */
   public async moveToLobby(gameId: string) {
     const { game } = await this._findGameModel(gameId);
-    game.updateStatus(GameStatus.LOBBY);
+    game.setStatus(GameStatus.LOBBY);
   }
 
   /**
@@ -54,7 +54,7 @@ class GameService implements GameServiceInterface {
    */
   public async moveToGame(gameId: string) {
     const { game } = await this._findGameModel(gameId);
-    game.updateStatus(GameStatus.GAME);
+    game.setStatus(GameStatus.GAME);
   }
 
   /**
@@ -63,7 +63,7 @@ class GameService implements GameServiceInterface {
    */
   public async moveToEnd(gameId: string) {
     const { game } = await this._findGameModel(gameId);
-    game.updateStatus(GameStatus.END);
+    game.setStatus(GameStatus.END);
   }
 
   // PRIVATE METHODS
@@ -78,9 +78,9 @@ class GameService implements GameServiceInterface {
    * @param gameId - Game ID
    * @param status - The new status
    */
-  private async _updateStatus(gameId: string, status: GameStatus) {
+  private async _setStatus(gameId: string, status: GameStatus) {
     const { game } = await this._findGameModel(gameId);
-    game.updateStatus(status);
+    game.setStatus(status);
   }
 }
 

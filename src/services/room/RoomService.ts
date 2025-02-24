@@ -123,7 +123,7 @@ class RoomService implements RoomServiceInterface {
    */
   public async assignGameToRoom(roomId: string, gameId: string) {
     const { room } = await this._findRoomModel(roomId);
-    room.setGame(gameId);
+    room.setGameId(gameId);
   }
 
   /**
@@ -133,9 +133,9 @@ class RoomService implements RoomServiceInterface {
    */
   public async changeDrawerTurn(roomId: string, remove = false) {
     const { room } = await this._findRoomModel(roomId);
-    if (!remove) return room.nextTurn();
-    room.setDrawerId(undefined);
-    return room.getDrawerId();
+    const nextDrawerId = remove ? undefined : room.nextDrawerId;
+    room.setDrawerId(nextDrawerId);
+    return room.drawerId;
   }
 
   // PRIVATE METHODS
@@ -180,8 +180,7 @@ class RoomService implements RoomServiceInterface {
    */
   private async _selectNewOwner(roomId: string) {
     const { room } = await this._findRoomModel(roomId);
-    const isOwnerSet = room.setOwner(room.randomDoodlerId);
-    return isOwnerSet;
+    room.setOwnerId(room.randomDoodlerId);
   }
 
   /**
