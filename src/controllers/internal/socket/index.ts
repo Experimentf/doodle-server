@@ -9,9 +9,6 @@ import { SocketControllerInterface } from './interface';
 class SocketController implements SocketControllerInterface {
   /**
    * Handle the socket disconnecting event
-   * 1. Remove Doodler from room
-   * 2. Check room validitiy for a game
-   * 3. End game if invalid game
    */
   public handleSocketOnDisconnecting: SocketControllerInterface['handleSocketOnDisconnecting'] =
     (socket) => async () => {
@@ -20,6 +17,8 @@ class SocketController implements SocketControllerInterface {
       Promise.all(
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
+
+          // Remove doodler from their room
           const room = await RoomServiceInstance.removeDoodlerFromRoom(
             roomId,
             doodlerId
@@ -27,8 +26,12 @@ class SocketController implements SocketControllerInterface {
           socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_LEAVE, {
             doodlerId
           });
+
+          // Check for game validity in the room after removing the doodler
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
+
+          // Update the game status if room exists and the game is not valid anymore
           if (!isValidGameRoom && room) {
             const game = !room.gameId
               ? undefined
@@ -47,6 +50,7 @@ class SocketController implements SocketControllerInterface {
           }
         })
       ).finally(async () => {
+        // Remove the doodler from the doodler service
         DoodlerServiceInstance.removeDoodler(socket.id);
       });
     };
