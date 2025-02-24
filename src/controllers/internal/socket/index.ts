@@ -36,9 +36,14 @@ class SocketController implements SocketControllerInterface {
                   room.gameId,
                   GameStatus.LOBBY
                 );
-            socket
-              .to(roomId)
-              .emit(GameSocketEvents.EMIT_GAME_STATUS_UPDATED, { room, game });
+            const updatedRoom = await RoomServiceInstance.changeDrawerTurn(
+              roomId,
+              true
+            );
+            socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_STATUS_UPDATED, {
+              room: updatedRoom,
+              game
+            });
           }
         })
       ).finally(async () => {
