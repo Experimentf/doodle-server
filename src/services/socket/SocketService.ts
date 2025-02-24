@@ -34,12 +34,12 @@ class SocketService implements SocketServiceInterface {
    * @param socket
    */
   private _registerSocketReservedEvents(socket: SocketType) {
-    this._registerReservedSocketEvent(
+    this._registerReservedEvent(
       socket,
       SocketEvents.ON_DISCONNECTING,
       this._controller.handleSocketOnDisconnecting(socket)
     );
-    this._registerReservedSocketEvent(
+    this._registerReservedEvent(
       socket,
       SocketEvents.ON_DISCONNECT,
       this._controller.handleSocketOnDisconnect(socket)
@@ -137,7 +137,7 @@ class SocketService implements SocketServiceInterface {
    * @param event Reserved Event Name
    * @param handler Event Handler
    */
-  private _registerReservedSocketEvent(
+  private _registerReservedEvent(
     socket: SocketType,
     event: SocketEvents,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

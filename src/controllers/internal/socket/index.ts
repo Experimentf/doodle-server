@@ -20,13 +20,16 @@ class SocketController implements SocketControllerInterface {
       Promise.all(
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
-          await RoomServiceInstance.removeDoodlerFromRoom(roomId, doodlerId);
+          const room = await RoomServiceInstance.removeDoodlerFromRoom(
+            roomId,
+            doodlerId
+          );
           socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_LEAVE, {
             doodlerId
           });
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
-          if (!isValidGameRoom) {
+          if (!isValidGameRoom && room) {
             const { gameId } = await RoomServiceInstance.findRoom(roomId);
             if (gameId)
               await GameServiceInstance.updateStatus(gameId, GameStatus.LOBBY);
