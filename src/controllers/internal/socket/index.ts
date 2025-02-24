@@ -1,5 +1,6 @@
 import { GameSocketEvents, RoomSocketEvents } from '@/constants/events/socket';
 import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
+import GameServiceInstance from '@/services/game/GameService';
 import RoomServiceInstance from '@/services/room/RoomService';
 
 import { SocketControllerInterface } from './interface';
@@ -7,6 +8,9 @@ import { SocketControllerInterface } from './interface';
 class SocketController implements SocketControllerInterface {
   /**
    * Handle the socket disconnecting event
+   * 1. Remove Doodler from room
+   * 2. Check room validitiy for a game
+   * 3. End game if invalid game
    */
   public handleSocketOnDisconnecting: SocketControllerInterface['handleSocketOnDisconnecting'] =
     (socket) => async () => {
@@ -22,9 +26,13 @@ class SocketController implements SocketControllerInterface {
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
           if (!isValidGameRoom) {
+            const {
+              room: { gameId }
+            } = await RoomServiceInstance.findRoom(roomId);
+            if (gameId) await GameServiceInstance.moveToLobby(gameId);
             socket
               .to(roomId)
-              .emit(GameSocketEvents.EMIT_GAME_END, { drawerId: undefined });
+              .emit(GameSocketEvents.EMIT_GAME_LOBBY, { drawerId: undefined });
           }
         })
       ).finally(async () => {

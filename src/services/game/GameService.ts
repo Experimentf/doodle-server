@@ -57,6 +57,15 @@ class GameService implements GameServiceInterface {
     game.updateStatus(GameStatus.GAME);
   }
 
+  /**
+   *
+   * @param gameId - Game that needs to be moved to game
+   */
+  public async moveToEnd(gameId: string) {
+    const { game } = await this._findGameModel(gameId);
+    game.updateStatus(GameStatus.END);
+  }
+
   // PRIVATE METHODS
   private async _findGameModel(gameId: string) {
     const game = this._games.get(gameId);

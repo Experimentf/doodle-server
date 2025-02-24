@@ -9,4 +9,5 @@ export interface GameServiceInterface {
   // GAME
   moveToLobby: (gameId: string) => Promise<void>;
   moveToGame: (gameId: string) => Promise<void>;
+  moveToEnd: (gameId: string) => Promise<void>;
 }
