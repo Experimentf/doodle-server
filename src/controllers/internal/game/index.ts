@@ -1,4 +1,7 @@
+import { GameSocketEvents } from '@/constants/events/socket';
 import GameServiceInstance from '@/services/game/GameService';
+import RoomServiceInstance from '@/services/room/RoomService';
+import { DoodleServerError } from '@/utils/error';
 
 import { GameControllerInterface } from './interface';
 
@@ -19,6 +22,24 @@ class GameController implements GameControllerInterface {
       //   GameServiceInstance.startGame(roomId);
       // }
 
+      respond({ data: { game } });
+    };
+
+  public handleGameOnGameCanvasOperation: GameControllerInterface['handleGameOnGameCanvasOperation'] =
+    (socket) => async (payload, respond) => {
+      const { roomId, canvasOperation } = payload;
+      const { gameId } = await RoomServiceInstance.findRoomWithDoodler(
+        roomId,
+        socket.id
+      );
+      if (!gameId) throw new DoodleServerError('Game not found!');
+      const game = await GameServiceInstance.updateCanvasOperations(
+        gameId,
+        canvasOperation
+      );
+      socket
+        .to(roomId)
+        .emit(GameSocketEvents.EMIT_GAME_CANVAS_OPERATION, { canvasOperation });
       respond({ data: { game } });
     };
 }

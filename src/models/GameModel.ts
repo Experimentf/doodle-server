@@ -1,5 +1,6 @@
 import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
-import { GameOptions, GameStatus } from '@/types/game';
+import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
+import Stack from '@/utils/stack';
 import { generateId } from '@/utils/unique';
 
 /**
@@ -10,6 +11,7 @@ class GameModel {
   public readonly id: string;
   private _status: GameStatus = GameStatus.LOBBY;
   private _options: GameOptions = DEFAULT_GAME_OPTIONS;
+  private _canvasOperationsStack = new Stack<CanvasOperation>();
 
   constructor(options?: Partial<GameOptions>) {
     this.id = generateId();
@@ -32,6 +34,19 @@ class GameModel {
 
   public setStatus(status: GameStatus) {
     this._status = status;
+  }
+
+  // Canvas Operations
+  public addCanvasOperation(canvasOperation: CanvasOperation) {
+    this._canvasOperationsStack.push(canvasOperation);
+  }
+
+  public undoCanvasOperation() {
+    this._canvasOperationsStack.pop();
+  }
+
+  public redoCanvasOperation() {
+    this._canvasOperationsStack.unpop();
   }
 
   // Doodler Interface

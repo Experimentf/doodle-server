@@ -1,4 +1,4 @@
-import { GameStatus } from '@/types/game';
+import { CanvasOperation, GameStatus } from '@/types/game';
 import { GameInterface } from '@/types/socket/game';
 
 export interface GameServiceInterface {
@@ -9,4 +9,8 @@ export interface GameServiceInterface {
 
   // GAME
   updateStatus: (gameId: string, status: GameStatus) => Promise<GameInterface>;
+  updateCanvasOperations: (
+    gameId: string,
+    canvasOperation: CanvasOperation
+  ) => Promise<GameInterface>;
 }

@@ -1,5 +1,11 @@
 import GameModel from '@/models/GameModel';
-import { GameInfoMapType, GameOptions, GameStatus } from '@/types/game';
+import {
+  CanvasAction,
+  CanvasOperation,
+  GameInfoMapType,
+  GameOptions,
+  GameStatus
+} from '@/types/game';
 import { DoodleServerError } from '@/utils/error';
 
 import { GameServiceInterface } from './interface';
@@ -47,6 +53,20 @@ class GameService implements GameServiceInterface {
   public async updateStatus(gameId: string, status: GameStatus) {
     const gameModel = await this._findGameModel(gameId);
     gameModel.setStatus(status);
+    return gameModel.json;
+  }
+
+  public async updateCanvasOperations(
+    gameId: string,
+    canvasOperation: CanvasOperation
+  ) {
+    const gameModel = await this._findGameModel(gameId);
+    const { actionType } = canvasOperation;
+    if (actionType === CanvasAction.UNDO) {
+      gameModel.undoCanvasOperation();
+    } else if (actionType === CanvasAction.REDO) {
+      gameModel.redoCanvasOperation();
+    } else gameModel.addCanvasOperation(canvasOperation);
     return gameModel.json;
   }
 

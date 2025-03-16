@@ -7,4 +7,11 @@ export interface GameControllerInterface {
   ) => (
     ...args: Parameters<ClientToServerEvents[GameSocketEvents.ON_GET_GAME]>
   ) => void;
+  handleGameOnGameCanvasOperation: (
+    socket: SocketType
+  ) => (
+    ...args: Parameters<
+      ClientToServerEvents[GameSocketEvents.ON_GAME_CANVAS_OPERATION]
+    >
+  ) => void;
 }

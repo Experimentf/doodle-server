@@ -1,6 +1,11 @@
 import GameModel from '@/models/GameModel';
 import { RoomModel } from '@/models/RoomModel';
 
+export interface Coordinate {
+  x: number;
+  y: number;
+}
+
 export enum GameStatus {
   GAME = 'in_game', // A GAME IS GOING ON
   LOBBY = 'in_lobby', //  ROOM IS IN LOBBY
@@ -24,6 +29,22 @@ export interface GameOptions {
     max: number;
   };
   word: string;
+}
+
+export enum CanvasAction {
+  LINE = 'line',
+  FILL = 'fill',
+  ERASE = 'erase',
+  CLEAR = 'clear',
+  UNDO = 'undo',
+  REDO = 'redo'
+}
+
+export interface CanvasOperation {
+  actionType?: CanvasAction;
+  points?: Array<Coordinate>;
+  color?: string;
+  size?: number;
 }
 
 export type RoomInfoMapType = Map<string, RoomModel>;
