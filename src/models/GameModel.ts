@@ -41,14 +41,6 @@ class GameModel {
     this._canvasOperationsStack.push(canvasOperation);
   }
 
-  public undoCanvasOperation() {
-    this._canvasOperationsStack.pop();
-  }
-
-  public redoCanvasOperation() {
-    this._canvasOperationsStack.unpop();
-  }
-
   // Doodler Interface
   public get json() {
     return {

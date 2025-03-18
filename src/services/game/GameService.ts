@@ -1,6 +1,5 @@
 import GameModel from '@/models/GameModel';
 import {
-  CanvasAction,
   CanvasOperation,
   GameInfoMapType,
   GameOptions,
@@ -56,17 +55,18 @@ class GameService implements GameServiceInterface {
     return gameModel.json;
   }
 
+  /**
+   *
+   * @param gameId Game ID
+   * @param canvasOperation Operation made on canvas
+   * @returns
+   */
   public async updateCanvasOperations(
     gameId: string,
     canvasOperation: CanvasOperation
   ) {
     const gameModel = await this._findGameModel(gameId);
-    const { actionType } = canvasOperation;
-    if (actionType === CanvasAction.UNDO) {
-      gameModel.undoCanvasOperation();
-    } else if (actionType === CanvasAction.REDO) {
-      gameModel.redoCanvasOperation();
-    } else gameModel.addCanvasOperation(canvasOperation);
+    gameModel.addCanvasOperation(canvasOperation);
     return gameModel.json;
   }
 
