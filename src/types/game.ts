@@ -39,8 +39,8 @@ export enum CanvasAction {
 }
 
 export interface CanvasOperation {
-  actionType?: CanvasAction;
-  points?: Array<Coordinate>;
+  actionType: CanvasAction;
+  points: Array<Coordinate>;
   color?: string;
   size?: number;
 }

@@ -46,7 +46,8 @@ class GameModel {
     return {
       id: this.id,
       status: this._status,
-      options: this._options
+      options: this._options,
+      canvasOperations: this._canvasOperationsStack.toArray()
     };
   }
 
