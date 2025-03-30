@@ -12,10 +12,13 @@ class GameModel {
   private _status: GameStatus = GameStatus.LOBBY;
   private _options: GameOptions = DEFAULT_GAME_OPTIONS;
   private _canvasOperationsStack = new Stack<CanvasOperation>();
+  private _timer: NodeJS.Timer | null = null;
+  private _roomId: string;
 
-  constructor(options?: Partial<GameOptions>) {
+  constructor(roomId: string, options?: Partial<GameOptions>) {
     this.id = generateId();
     this._options = this._createOptions(options);
+    this._roomId = roomId;
   }
 
   // Options
@@ -51,11 +54,32 @@ class GameModel {
     };
   }
 
+  public get roomId() {
+    return this._roomId;
+  }
+
+  public startTimer(timeInSeconds: number, callback: () => void) {
+    this._timer = setInterval(() => {
+      callback();
+    }, timeInSeconds * 1000);
+  }
+
+  public resetTimer() {
+    if (this._timer) clearInterval(this._timer);
+    this._timer = null;
+  }
+
   // PRIVATE METHODS
   private _createOptions(options?: Partial<GameOptions>) {
     const newOptions: GameOptions = DEFAULT_GAME_OPTIONS;
     if (options?.round?.max) newOptions.round.max = options.round.max;
-    if (options?.time?.max) newOptions.time.max = options.time.max;
+    if (options?.timers?.drawing?.max)
+      newOptions.timers.drawing.max = options.timers.drawing.max;
+    if (options?.timers?.roundEndCooldownTime?.max)
+      newOptions.timers.roundEndCooldownTime.max =
+        options.timers.roundEndCooldownTime.max;
+    if (options?.timers?.chooseWordTime?.max)
+      newOptions.timers.chooseWordTime.max = options.timers.chooseWordTime.max;
     return newOptions;
   }
 }

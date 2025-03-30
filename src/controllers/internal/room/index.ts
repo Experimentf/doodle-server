@@ -24,7 +24,7 @@ class RoomController implements RoomControllerInterface {
 
       let game: GameInterface | undefined = undefined;
       if (!gameId) {
-        const gameInterface = await GameServiceInstance.createGame();
+        const gameInterface = await GameServiceInstance.createGame(roomId);
         await RoomServiceInstance.assignGameToRoom(roomId, gameInterface.id);
         game = gameInterface;
       } else {

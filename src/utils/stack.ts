@@ -45,6 +45,11 @@ class Stack<T> {
     if (this._top === -1) return [];
     return this.container.slice(0, this._top + 1);
   }
+
+  clear() {
+    this.container = [];
+    this._top = -1;
+  }
 }
 
 export default Stack;

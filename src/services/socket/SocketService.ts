@@ -17,7 +17,7 @@ class SocketService implements SocketServiceInterface {
   /**
    * Register Incoming Connections on IO
    */
-  public start(io: IoType) {
+  public start: SocketServiceInterface['start'] = (io) => {
     this._io = io;
     io.on('connection', (socket) => {
       console.log('User connected :', socket.id);
@@ -26,7 +26,15 @@ class SocketService implements SocketServiceInterface {
       this._registerRoomSocketEvents(socket);
       this._registerGameSocketEvents(socket);
     });
-  }
+  };
+
+  /**
+   * Emit an event to client
+   */
+  public emitEventToClientRoom: SocketServiceInterface['emitEventToClientRoom'] =
+    (roomId, ev, payload) => {
+      this._io?.to(roomId).emit(ev, ...payload);
+    };
 
   // PRIVATE METHODS
   /**
