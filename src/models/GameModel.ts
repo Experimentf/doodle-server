@@ -14,6 +14,7 @@ class GameModel {
   private _canvasOperationsStack = new Stack<CanvasOperation>();
   private _timer: NodeJS.Timer | null = null;
   private _roomId: string;
+  private _previousDrawerSet: Set<string> = new Set();
 
   constructor(roomId: string, options?: Partial<GameOptions>) {
     this.id = generateId();
@@ -32,6 +33,20 @@ class GameModel {
 
   public updateOptions(options: Partial<GameOptions>) {
     this._options = { ...this._options, ...options };
+  }
+
+  public addDrawer(drawerId?: string) {
+    if (!drawerId) return;
+    this._previousDrawerSet.add(drawerId);
+  }
+
+  public incrementRound() {
+    this._options.round.current += 1;
+    this._previousDrawerSet.clear();
+  }
+
+  public checkNewRound(drawerId?: string) {
+    return drawerId && this._previousDrawerSet.has(drawerId);
   }
 
   // Status

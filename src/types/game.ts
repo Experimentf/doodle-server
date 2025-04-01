@@ -11,7 +11,7 @@ export enum GameStatus {
   LOBBY = 'in_lobby', //  ROOM IS IN LOBBY
   CHOOSE_WORD = 'in_choose_word', // ROOM IS WAITING FOR DRAWER TO CHOOSE WORD
   TURN_END = 'in_turn_end', // ROOM IS SEEING A TURN END
-  ROUND_END = 'in_round_end', // ROOM IS SEEING A ROUND END
+  ROUND_START = 'in_round_start', // ROOM IS SEEING A ROUND START
   RESULT = 'in_result' // ROOM IS SEEING THE GAME'S FINAL RESULT
 }
 
@@ -29,6 +29,10 @@ export interface GameOptions {
       max: number;
     };
     turnEndCooldownTime: {
+      current: number;
+      max: number;
+    };
+    roundStartCooldownTime: {
       current: number;
       max: number;
     };

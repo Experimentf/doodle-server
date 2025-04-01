@@ -70,8 +70,8 @@ class GameService implements GameServiceInterface {
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
 
     // Inform status change to invloved clients
+    const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     if (informAffectedClients) {
-      const room = await RoomServiceInstance.findRoom(gameModel.roomId);
       SocketServiceInstance.emitEventToClientRoom(
         gameModel.roomId,
         GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
@@ -88,17 +88,44 @@ class GameService implements GameServiceInterface {
     } else if (status === GameStatus.LOBBY) {
       gameModel.resetTimer();
     } else if (status === GameStatus.CHOOSE_WORD) {
+      gameModel.addDrawer(room.drawerId);
       gameModel.resetTimer();
       gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {
         this.updateStatus(gameId, GameStatus.GAME, true, { word: 'auto' });
       });
     } else if (status === GameStatus.TURN_END) {
       gameModel.resetTimer();
-      // Start round end cooldown time
+      // Start turn end cooldown time
       gameModel.startTimer(
         gameModel.options.timers.turnEndCooldownTime.max,
         async () => {
-          await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
+          const { drawerId: newDrawerId } =
+            await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
+          const isNewRoundRequired = gameModel.checkNewRound(newDrawerId);
+          if (
+            gameModel.options.round.current === gameModel.options.round.max &&
+            isNewRoundRequired
+          ) {
+            await RoomServiceInstance.changeDrawerTurn(gameModel.roomId, true);
+            this.updateStatus(gameId, GameStatus.RESULT, true);
+          } else {
+            if (isNewRoundRequired) {
+              gameModel.incrementRound();
+              this.updateStatus(gameId, GameStatus.ROUND_START, true);
+            } else {
+              this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {
+                word: DEFAULT_WORD
+              });
+            }
+          }
+        }
+      );
+    } else if (status === GameStatus.ROUND_START) {
+      gameModel.resetTimer();
+      // Start the round end cooldown timer
+      gameModel.startTimer(
+        gameModel.options.timers.roundStartCooldownTime.max,
+        () => {
           this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {
             word: DEFAULT_WORD
           });
