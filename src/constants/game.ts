@@ -6,6 +6,7 @@ export const DEFAULT_MAX_ROUND_END_COOLDOWN_TIME = 8;
 export const DEFAULT_MAX_CHOOSE_WORD_TIME = 10;
 export const DEFAULT_CAPACITY = 3;
 export const MINIMUM_VALID_SIZE = 2;
+export const DEFAULT_WORD = '_';
 export const DEFAULT_GAME_OPTIONS: GameOptions = {
   round: { current: 1, max: DEFAULT_MAX_ROUNDS },
   timers: {
@@ -16,5 +17,5 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     },
     chooseWordTime: { current: 0, max: DEFAULT_MAX_CHOOSE_WORD_TIME }
   },
-  word: '___'
+  word: DEFAULT_WORD
 };

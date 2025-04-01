@@ -14,4 +14,11 @@ export interface GameControllerInterface {
       ClientToServerEvents[GameSocketEvents.ON_GAME_CANVAS_OPERATION]
     >
   ) => void;
+  handleGameOnChooseWord: (
+    socket: SocketType
+  ) => (
+    ...args: Parameters<
+      ClientToServerEvents[GameSocketEvents.ON_GAME_CHOOSE_WORD]
+    >
+  ) => void;
 }

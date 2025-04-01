@@ -1,4 +1,5 @@
 import { GameSocketEvents } from '@/constants/events/socket';
+import { DEFAULT_WORD } from '@/constants/game';
 import GameModel from '@/models/GameModel';
 import {
   CanvasOperation,
@@ -58,10 +59,15 @@ class GameService implements GameServiceInterface {
   public async updateStatus(
     gameId: string,
     status: GameStatus,
-    informAffectedClients = false
+    informAffectedClients = false,
+    extraInfo?: { word: string }
   ) {
     const gameModel = await this._findGameModel(gameId);
     gameModel.setStatus(status);
+    if (extraInfo?.word) {
+      gameModel.updateOptions({ word: extraInfo.word });
+    }
+    if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
 
     // Inform status change to invloved clients
     if (informAffectedClients) {
@@ -83,6 +89,9 @@ class GameService implements GameServiceInterface {
       gameModel.resetTimer();
     } else if (status === GameStatus.CHOOSE_WORD) {
       gameModel.resetTimer();
+      gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {
+        this.updateStatus(gameId, GameStatus.GAME, true, { word: 'auto' });
+      });
     } else if (status === GameStatus.ROUND_END) {
       gameModel.resetTimer();
       // Start round end cooldown time
@@ -90,7 +99,9 @@ class GameService implements GameServiceInterface {
         gameModel.options.timers.roundEndCooldownTime.max,
         async () => {
           await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
-          this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true);
+          this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {
+            word: DEFAULT_WORD
+          });
         }
       );
     } else if (status === GameStatus.RESULT) {

@@ -47,7 +47,7 @@ class RoomController implements RoomControllerInterface {
         const room = await RoomServiceInstance.changeDrawerTurn(roomId);
         const gameInterface = await GameServiceInstance.updateStatus(
           game.id,
-          GameStatus.GAME
+          GameStatus.CHOOSE_WORD
         );
         socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_STATUS_UPDATED, {
           room,

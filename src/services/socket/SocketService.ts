@@ -113,6 +113,11 @@ class SocketService implements SocketServiceInterface {
       GameSocketEvents.ON_GAME_CANVAS_OPERATION,
       this._controller.handleGameOnGameCanvasOperation(socket)
     );
+    this._registerCustomSocketEvent(
+      socket,
+      GameSocketEvents.ON_GAME_CHOOSE_WORD,
+      this._controller.handleGameOnChooseWord(socket)
+    );
   }
 
   /**

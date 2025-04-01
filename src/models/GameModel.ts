@@ -30,6 +30,10 @@ class GameModel {
     this._options = this._createOptions(options);
   }
 
+  public updateOptions(options: Partial<GameOptions>) {
+    this._options = { ...this._options, ...options };
+  }
+
   // Status
   public get status() {
     return this._status;
@@ -42,6 +46,10 @@ class GameModel {
   // Canvas Operations
   public addCanvasOperation(canvasOperation: CanvasOperation) {
     this._canvasOperationsStack.push(canvasOperation);
+  }
+
+  public clearCanvasOperations() {
+    this._canvasOperationsStack.clear();
   }
 
   // Doodler Interface

@@ -16,6 +16,10 @@ export interface GameClientToServerEventsArgumentMap {
     { roomId: string; canvasOperation: CanvasOperation },
     { game: GameInterface }
   >;
+  [GameSocketEvents.ON_GAME_CHOOSE_WORD]: ClientToServerEventsArgument<
+    { roomId: string; word: string },
+    { game: GameInterface }
+  >;
 }
 
 export interface GameServerToClientEvents {
