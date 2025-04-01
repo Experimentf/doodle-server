@@ -83,7 +83,7 @@ class GameService implements GameServiceInterface {
       gameModel.resetTimer();
       // Start drawing time
       gameModel.startTimer(gameModel.options.timers.drawing.max, async () => {
-        this.updateStatus(gameId, GameStatus.ROUND_END, true);
+        this.updateStatus(gameId, GameStatus.TURN_END, true);
       });
     } else if (status === GameStatus.LOBBY) {
       gameModel.resetTimer();
@@ -92,11 +92,11 @@ class GameService implements GameServiceInterface {
       gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {
         this.updateStatus(gameId, GameStatus.GAME, true, { word: 'auto' });
       });
-    } else if (status === GameStatus.ROUND_END) {
+    } else if (status === GameStatus.TURN_END) {
       gameModel.resetTimer();
       // Start round end cooldown time
       gameModel.startTimer(
-        gameModel.options.timers.roundEndCooldownTime.max,
+        gameModel.options.timers.turnEndCooldownTime.max,
         async () => {
           await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
           this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {

@@ -83,9 +83,9 @@ class GameModel {
     if (options?.round?.max) newOptions.round.max = options.round.max;
     if (options?.timers?.drawing?.max)
       newOptions.timers.drawing.max = options.timers.drawing.max;
-    if (options?.timers?.roundEndCooldownTime?.max)
-      newOptions.timers.roundEndCooldownTime.max =
-        options.timers.roundEndCooldownTime.max;
+    if (options?.timers?.turnEndCooldownTime?.max)
+      newOptions.timers.turnEndCooldownTime.max =
+        options.timers.turnEndCooldownTime.max;
     if (options?.timers?.chooseWordTime?.max)
       newOptions.timers.chooseWordTime.max = options.timers.chooseWordTime.max;
     return newOptions;
