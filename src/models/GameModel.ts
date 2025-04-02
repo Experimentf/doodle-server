@@ -1,4 +1,4 @@
-import { DEFAULT_GAME_OPTIONS, DEFAULT_WORD } from '@/constants/game';
+import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
 import Stack from '@/utils/stack';
 import { generateId } from '@/utils/unique';
@@ -10,7 +10,9 @@ import { generateId } from '@/utils/unique';
 class GameModel {
   public readonly id: string;
   private _status: GameStatus = GameStatus.LOBBY;
-  private _options: GameOptions = DEFAULT_GAME_OPTIONS;
+  private _options: GameOptions = JSON.parse(
+    JSON.stringify(DEFAULT_GAME_OPTIONS)
+  );
   private _canvasOperationsStack = new Stack<CanvasOperation>();
   private _timer: NodeJS.Timer | null = null;
   private _roomId: string;
@@ -18,39 +20,14 @@ class GameModel {
 
   constructor(roomId: string, options?: Partial<GameOptions>) {
     this.id = generateId();
-    this._options = this._createOptions(options);
     this._roomId = roomId;
+    this._options = this._createOptions(options);
   }
 
   // Reset everything
   public reset() {
     this.resetTimer();
-    this.updateOptions({
-      round: { current: 0, max: this._options.round.max },
-      timers: {
-        chooseWordTime: {
-          current: 0,
-          max: this._options.timers.chooseWordTime.max
-        },
-        drawing: {
-          current: 0,
-          max: this._options.timers.drawing.max
-        },
-        roundStartCooldownTime: {
-          current: 0,
-          max: this._options.timers.roundStartCooldownTime.max
-        },
-        turnEndCooldownTime: {
-          current: 0,
-          max: this._options.timers.turnEndCooldownTime.max
-        },
-        resultCooldownTime: {
-          current: 0,
-          max: this._options.timers.resultCooldownTime.max
-        }
-      },
-      word: DEFAULT_WORD
-    });
+    this._options = JSON.parse(JSON.stringify(DEFAULT_GAME_OPTIONS));
   }
 
   // Options
@@ -125,7 +102,7 @@ class GameModel {
 
   // PRIVATE METHODS
   private _createOptions(options?: Partial<GameOptions>) {
-    const newOptions: GameOptions = DEFAULT_GAME_OPTIONS;
+    const newOptions = JSON.parse(JSON.stringify(DEFAULT_GAME_OPTIONS));
     if (options?.round?.max) newOptions.round.max = options.round.max;
     if (options?.timers?.drawing?.max)
       newOptions.timers.drawing.max = options.timers.drawing.max;

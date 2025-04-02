@@ -148,6 +148,7 @@ class GameService implements GameServiceInterface {
             gameModel.roomId
           );
           if (isValid) {
+            await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
             this.updateStatus(gameId, GameStatus.ROUND_START, true);
           } else {
             this.updateStatus(gameId, GameStatus.LOBBY, true);

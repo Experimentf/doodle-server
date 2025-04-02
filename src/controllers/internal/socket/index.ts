@@ -34,6 +34,7 @@ class SocketController implements SocketControllerInterface {
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
 
+          // Delete the game if room was deleted
           if (!room && roomBeforeRemoval.gameId) {
             await GameServiceInstance.deleteGame(roomBeforeRemoval.gameId);
           }
