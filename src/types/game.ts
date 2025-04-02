@@ -40,6 +40,10 @@ export interface GameOptions {
       current: number;
       max: number;
     };
+    resultCooldownTime: {
+      current: number;
+      max: number;
+    };
   };
   round: {
     current: number;

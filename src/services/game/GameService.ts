@@ -133,6 +133,16 @@ class GameService implements GameServiceInterface {
       );
     } else if (status === GameStatus.RESULT) {
       gameModel.resetTimer();
+      // Start the result cooldown timer
+      gameModel.startTimer(
+        gameModel.options.timers.resultCooldownTime.max,
+        () => {
+          gameModel.reset();
+          this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {
+            word: DEFAULT_WORD
+          });
+        }
+      );
     }
     return gameModel.json;
   }

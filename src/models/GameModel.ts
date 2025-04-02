@@ -1,4 +1,4 @@
-import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
+import { DEFAULT_GAME_OPTIONS, DEFAULT_WORD } from '@/constants/game';
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
 import Stack from '@/utils/stack';
 import { generateId } from '@/utils/unique';
@@ -20,6 +20,36 @@ class GameModel {
     this.id = generateId();
     this._options = this._createOptions(options);
     this._roomId = roomId;
+  }
+
+  // Reset everything
+  public reset() {
+    this.updateOptions({
+      round: { current: 0, max: this._options.round.max },
+      timers: {
+        chooseWordTime: {
+          current: 0,
+          max: this._options.timers.chooseWordTime.max
+        },
+        drawing: {
+          current: 0,
+          max: this._options.timers.drawing.max
+        },
+        roundStartCooldownTime: {
+          current: 0,
+          max: this._options.timers.roundStartCooldownTime.max
+        },
+        turnEndCooldownTime: {
+          current: 0,
+          max: this._options.timers.turnEndCooldownTime.max
+        },
+        resultCooldownTime: {
+          current: 0,
+          max: this._options.timers.resultCooldownTime.max
+        }
+      },
+      word: DEFAULT_WORD
+    });
   }
 
   // Options
