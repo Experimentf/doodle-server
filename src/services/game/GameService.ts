@@ -136,11 +136,16 @@ class GameService implements GameServiceInterface {
       // Start the result cooldown timer
       gameModel.startTimer(
         gameModel.options.timers.resultCooldownTime.max,
-        () => {
+        async () => {
           gameModel.reset();
-          this.updateStatus(gameId, GameStatus.CHOOSE_WORD, true, {
-            word: DEFAULT_WORD
-          });
+          const isValid = await RoomServiceInstance.isValidGameRoom(
+            gameModel.roomId
+          );
+          if (isValid) {
+            this.updateStatus(gameId, GameStatus.ROUND_START, true);
+          } else {
+            this.updateStatus(gameId, GameStatus.LOBBY, true);
+          }
         }
       );
     }

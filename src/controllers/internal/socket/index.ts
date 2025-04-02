@@ -37,7 +37,7 @@ class SocketController implements SocketControllerInterface {
               ? undefined
               : await GameServiceInstance.updateStatus(
                   room.gameId,
-                  GameStatus.LOBBY
+                  GameStatus.RESULT
                 );
             const updatedRoom = await RoomServiceInstance.changeDrawerTurn(
               roomId,
