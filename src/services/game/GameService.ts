@@ -8,6 +8,7 @@ import {
   GameStatus
 } from '@/types/game';
 import { DoodleServerError } from '@/utils/error';
+import { fetchRandomWords } from '@/utils/words';
 
 import RoomServiceInstance from '../room/RoomService';
 import SocketServiceInstance from '../socket/SocketService';
@@ -74,6 +75,8 @@ class GameService implements GameServiceInterface {
       gameModel.updateOptions({ word: extraInfo.word });
     }
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
+    const wordOptions =
+      status === GameStatus.CHOOSE_WORD ? fetchRandomWords() : undefined;
 
     // Inform status change to invloved clients
     const room = await RoomServiceInstance.findRoom(gameModel.roomId);
@@ -81,7 +84,15 @@ class GameService implements GameServiceInterface {
       SocketServiceInstance.emitEventToClientRoom(
         gameModel.roomId,
         GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-        [{ room, game: gameModel.json }]
+        [
+          {
+            room,
+            game: gameModel.json,
+            extraInfo: {
+              wordOptions
+            }
+          }
+        ]
       );
     }
 
@@ -96,8 +107,15 @@ class GameService implements GameServiceInterface {
     } else if (status === GameStatus.CHOOSE_WORD) {
       gameModel.addDrawer(room.drawerId);
       gameModel.resetTimer();
+      const randomWord = fetchRandomWords(1)[0];
+      const autoChoiceWord = wordOptions
+        ? wordOptions[Math.floor(Math.random() * wordOptions.length)]
+        : randomWord;
+
       gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {
-        this.updateStatus(gameId, GameStatus.GAME, true, { word: 'auto' });
+        this.updateStatus(gameId, GameStatus.GAME, true, {
+          word: autoChoiceWord
+        });
       });
     } else if (status === GameStatus.TURN_END) {
       gameModel.resetTimer();

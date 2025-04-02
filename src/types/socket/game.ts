@@ -26,6 +26,9 @@ export interface GameServerToClientEvents {
   [GameSocketEvents.EMIT_GAME_STATUS_UPDATED]: (args: {
     room: RoomInterface;
     game?: GameInterface;
+    extraInfo?: {
+      wordOptions?: Array<string>;
+    };
   }) => void;
   [GameSocketEvents.EMIT_GAME_CANVAS_OPERATION]: (args: {
     canvasOperation: CanvasOperation;
