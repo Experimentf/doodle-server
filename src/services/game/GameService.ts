@@ -48,6 +48,12 @@ class GameService implements GameServiceInterface {
     return gameModel.json;
   }
 
+  public deleteGame: GameServiceInterface['deleteGame'] = async (gameId) => {
+    const gameModel = await this._findGameModel(gameId);
+    gameModel.reset();
+    return this._games.delete(gameId);
+  };
+
   /**
    * Updates the game status
    * Starts and resets game timers accordingly

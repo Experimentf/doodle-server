@@ -9,6 +9,7 @@ export interface GameServiceInterface {
     roomId: string,
     options?: Partial<GameOptions>
   ) => Promise<GameInterface>;
+  deleteGame: (gameId: string) => Promise<boolean>;
 
   // GAME
   updateStatus: (gameId: string, status: GameStatus) => Promise<GameInterface>;

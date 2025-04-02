@@ -18,6 +18,9 @@ class SocketController implements SocketControllerInterface {
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
 
+          const roomBeforeRemoval =
+            await RoomServiceInstance.findRoomWithDoodler(roomId, doodlerId);
+
           // Remove doodler from their room
           const room = await RoomServiceInstance.removeDoodlerFromRoom(
             roomId,
@@ -30,6 +33,10 @@ class SocketController implements SocketControllerInterface {
           // Check for game validity in the room after removing the doodler
           const isValidGameRoom =
             await RoomServiceInstance.isValidGameRoom(roomId);
+
+          if (!room && roomBeforeRemoval.gameId) {
+            await GameServiceInstance.deleteGame(roomBeforeRemoval.gameId);
+          }
 
           // Update the game status if room exists and the game is not valid anymore
           if (!isValidGameRoom && room) {

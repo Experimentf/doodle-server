@@ -24,6 +24,7 @@ class GameModel {
 
   // Reset everything
   public reset() {
+    this.resetTimer();
     this.updateOptions({
       round: { current: 0, max: this._options.round.max },
       timers: {
