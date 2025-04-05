@@ -7,6 +7,7 @@ import {
   GameOptions,
   GameStatus
 } from '@/types/game';
+import { HunchStatus } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
 import { fetchRandomWords } from '@/utils/words';
 
@@ -191,6 +192,28 @@ class GameService implements GameServiceInterface {
     gameModel.addCanvasOperation(canvasOperation);
     return gameModel.json;
   }
+
+  /**
+   * Validate if the message is guessed correctly
+   * @param gameId Game id
+   * @param message Message
+   */
+  public getHunchStatus: GameServiceInterface['getHunchStatus'] = async (
+    gameId,
+    message
+  ) => {
+    const gameModel = await this._findGameModel(gameId);
+    const correctWord = gameModel.options.word;
+    if (correctWord.length !== message.length) return HunchStatus.WRONG;
+    let mismatchCharCount = 0;
+    for (let i = 0; i < correctWord.length; i++) {
+      if (correctWord[i].toLowerCase() !== message[i].toLowerCase())
+        mismatchCharCount++;
+    }
+    if (mismatchCharCount === 0) return HunchStatus.CORRECT;
+    if (mismatchCharCount <= 2) return HunchStatus.NEARBY;
+    return HunchStatus.WRONG;
+  };
 
   // PRIVATE METHODS
   private async _findGameModel(gameId: string) {

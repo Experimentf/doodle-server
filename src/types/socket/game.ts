@@ -2,10 +2,24 @@ import { GameSocketEvents } from '@/constants/events/socket';
 import GameModel from '@/models/GameModel';
 
 import { CanvasOperation } from '../game';
+import { DoodlerInterface } from './doodler';
 import { ClientToServerEventsArgument } from './helper';
 import { RoomInterface } from './room';
 
 export type GameInterface = GameModel['json'];
+
+export enum HunchStatus {
+  CORRECT = 'correct',
+  NEARBY = 'nearby',
+  WRONG = 'wrong'
+}
+
+export interface HunchInterface {
+  senderId?: DoodlerInterface['id'];
+  message: string;
+  status?: HunchStatus;
+  isSystemMessage: boolean;
+}
 
 export interface GameClientToServerEventsArgumentMap {
   [GameSocketEvents.ON_GET_GAME]: ClientToServerEventsArgument<
@@ -20,6 +34,15 @@ export interface GameClientToServerEventsArgumentMap {
     { roomId: string; word: string },
     { game: GameInterface }
   >;
+  [GameSocketEvents.ON_GAME_HUNCH]: ClientToServerEventsArgument<
+    {
+      roomId: string;
+      message: string;
+    },
+    {
+      hunch: HunchInterface;
+    }
+  >;
 }
 
 export interface GameServerToClientEvents {
@@ -33,4 +56,5 @@ export interface GameServerToClientEvents {
   [GameSocketEvents.EMIT_GAME_CANVAS_OPERATION]: (args: {
     canvasOperation: CanvasOperation;
   }) => void;
+  [GameSocketEvents.ON_GAME_HUNCH]: (args: { hunch: HunchInterface }) => void;
 }

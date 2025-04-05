@@ -1,8 +1,11 @@
 import { GameSocketEvents } from '@/constants/events/socket';
+import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
 import GameServiceInstance from '@/services/game/GameService';
 import RoomServiceInstance from '@/services/room/RoomService';
 import { GameStatus } from '@/types/game';
+import { HunchStatus } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
+import { createHunch } from '@/utils/game';
 
 import { GameControllerInterface } from './interface';
 
@@ -64,6 +67,54 @@ class GameController implements GameControllerInterface {
         { word }
       );
       respond({ data: { game } });
+    };
+
+  public handleGameOnGameHunch: GameControllerInterface['handleGameOnGameHunch'] =
+    (socket) => async (payload, respond) => {
+      const { roomId, message } = payload;
+      const room = await RoomServiceInstance.findRoomWithDoodler(
+        roomId,
+        socket.id
+      );
+      if (!room.gameId) throw new DoodleServerError('Game not found!');
+      const game = await GameServiceInstance.findGame(room.gameId);
+
+      // If the socket is not drawer and status is game
+      if (room.drawerId !== socket.id && game.status === GameStatus.GAME) {
+        const hunchStatus = await GameServiceInstance.getHunchStatus(
+          room.gameId,
+          message
+        );
+        // If the hunch is correct, send a system message to all clients
+        if (hunchStatus === HunchStatus.CORRECT) {
+          const doodler = await DoodlerServiceInstance.findDooder(socket.id);
+          const hunch = createHunch(
+            `${doodler.name} hunched the word!`,
+            hunchStatus
+          );
+          socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_HUNCH, { hunch });
+          respond({ data: { hunch } });
+          return;
+        }
+        // If the hunch is nearby, send a system message to socket and normal message to all other clients
+        if (hunchStatus === HunchStatus.NEARBY) {
+          const senderHunch = createHunch(
+            `"${message}" is close!`,
+            hunchStatus
+          );
+          const receiverHunch = createHunch(message, hunchStatus, socket.id);
+          socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_HUNCH, {
+            hunch: { ...receiverHunch, status: HunchStatus.WRONG }
+          });
+          respond({ data: { hunch: senderHunch } });
+          return;
+        }
+      }
+      // If none of the above condition is correct, send a normal message to all
+      const hunch = createHunch(message, HunchStatus.WRONG, socket.id);
+      socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_HUNCH, { hunch });
+      respond({ data: { hunch } });
+      return;
     };
 }
 

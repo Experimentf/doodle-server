@@ -21,4 +21,9 @@ export interface GameControllerInterface {
       ClientToServerEvents[GameSocketEvents.ON_GAME_CHOOSE_WORD]
     >
   ) => void;
+  handleGameOnGameHunch: (
+    socket: SocketType
+  ) => (
+    ...args: Parameters<ClientToServerEvents[GameSocketEvents.ON_GAME_HUNCH]>
+  ) => void;
 }

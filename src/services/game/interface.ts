@@ -1,5 +1,5 @@
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
-import { GameInterface } from '@/types/socket/game';
+import { GameInterface, HunchStatus } from '@/types/socket/game';
 
 export interface GameServiceInterface {
   // FUNDAMENTALS
@@ -17,4 +17,7 @@ export interface GameServiceInterface {
     gameId: string,
     canvasOperation: CanvasOperation
   ) => Promise<GameInterface>;
+
+  // SCORE
+  getHunchStatus: (gameId: string, message: string) => Promise<HunchStatus>;
 }

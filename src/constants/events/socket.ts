@@ -26,6 +26,8 @@ export enum GameSocketEvents {
   ON_GET_GAME = 'get-game',
   ON_GAME_CANVAS_OPERATION = 'game-canvas-operation',
   ON_GAME_CHOOSE_WORD = 'game-choose-word',
+  ON_GAME_HUNCH = 'game-hunch',
   EMIT_GAME_STATUS_UPDATED = 'game-status-updated',
-  EMIT_GAME_CANVAS_OPERATION = 'game-canvas-operation'
+  EMIT_GAME_CANVAS_OPERATION = 'game-canvas-operation',
+  EMIT_GAME_HUNCH = 'game-hunch'
 }
