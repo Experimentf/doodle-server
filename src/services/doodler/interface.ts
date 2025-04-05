@@ -9,4 +9,6 @@ export interface DoodlerServiceInterface {
   removeDoodler: (doodlerId: string) => Promise<boolean>;
   findDooder: (doodlerId: string) => Promise<DoodlerInterface>;
   getDoodlers: (doodlerIds: string[]) => Promise<DoodlerInterface[]>;
+  incrementScore: (doodlerId: string, value: number) => Promise<void>;
+  clearScore: (doodlerId: string) => Promise<void>;
 }

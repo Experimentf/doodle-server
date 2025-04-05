@@ -51,6 +51,7 @@ export interface GameServerToClientEvents {
     game?: GameInterface;
     extraInfo?: {
       wordOptions?: Array<string>;
+      scores?: Array<[string, number]>;
     };
   }) => void;
   [GameSocketEvents.EMIT_GAME_CANVAS_OPERATION]: (args: {

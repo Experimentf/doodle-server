@@ -17,6 +17,7 @@ class GameModel {
   private _timer: NodeJS.Timer | null = null;
   private _roomId: string;
   private _previousDrawerSet: Set<string> = new Set();
+  private _hunchTimes: Array<[string, number]> = [];
 
   constructor(roomId: string, options?: Partial<GameOptions>) {
     this.id = generateId();
@@ -26,6 +27,8 @@ class GameModel {
 
   // Reset everything
   public reset() {
+    this.clearHunchTimes();
+    this.clearCanvasOperations();
     this.resetTimer();
     this._options = JSON.parse(JSON.stringify(DEFAULT_GAME_OPTIONS));
   }
@@ -55,6 +58,40 @@ class GameModel {
 
   public checkNewRound(drawerId?: string) {
     return drawerId && this._previousDrawerSet.has(drawerId);
+  }
+
+  // Hunch Time
+  public addHunchTime(doodlerId: string, timestamp: number) {
+    this._hunchTimes.push([doodlerId, timestamp]);
+  }
+
+  public clearHunchTimes() {
+    this._hunchTimes.splice(0, this._hunchTimes.length);
+  }
+
+  public get nHunches() {
+    return this._hunchTimes.length;
+  }
+
+  public calculateScoresByHunchTime() {
+    const scores: Array<[string, number]> = [];
+    if (this.nHunches === 0) return scores;
+    const sortedHunchTimes = [...this._hunchTimes].sort((a, b) => a[1] - b[1]);
+    const maxScore = 100;
+    const maxTimestamp = Math.max(
+      ...sortedHunchTimes.map((hunchTimes) => hunchTimes[1])
+    );
+    const minTimestamp = Math.min(
+      ...sortedHunchTimes.map((hunchTimes) => hunchTimes[1])
+    );
+    const timeRange = maxTimestamp - minTimestamp;
+    sortedHunchTimes.forEach(([id, time]) => {
+      const relativeTimeDifference =
+        (time - minTimestamp) / (timeRange != 0 ? timeRange : 1);
+      const score = ((1 - relativeTimeDifference) / 2 + 0.5) * maxScore;
+      scores.push([id, Math.floor(score)]);
+    });
+    return scores;
   }
 
   // Status

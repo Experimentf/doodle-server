@@ -4,6 +4,7 @@ import { RoomInfoMapType } from '@/types/game';
 import { RoomInterface } from '@/types/socket/room';
 import { DoodleServerError } from '@/utils/error';
 
+import DoodlerServiceInstance from '../doodler/DoodlerService';
 import { RoomServiceInterface } from './interface';
 
 class RoomService implements RoomServiceInterface {
@@ -116,6 +117,19 @@ class RoomService implements RoomServiceInterface {
     const nextDrawerId = remove ? undefined : roomModel.nextDrawerId;
     roomModel.setDrawerId(nextDrawerId);
     return roomModel.json;
+  }
+
+  /**
+   * Resets all the doodler scores to 0
+   * @param roomId Room ID
+   */
+  public async resetScoreboard(roomId: string) {
+    const room = await this.findRoom(roomId);
+    await Promise.all(
+      room.doodlers.map(
+        async (doodlerId) => await DoodlerServiceInstance.clearScore(doodlerId)
+      )
+    );
   }
 
   // PRIVATE METHODS

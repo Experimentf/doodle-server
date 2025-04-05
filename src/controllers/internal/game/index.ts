@@ -92,6 +92,7 @@ class GameController implements GameControllerInterface {
             `${doodler.name} hunched the word!`,
             hunchStatus
           );
+          await GameServiceInstance.addHunchTime(game.id, doodler.id);
           socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_HUNCH, { hunch });
           respond({ data: { hunch } });
           return;

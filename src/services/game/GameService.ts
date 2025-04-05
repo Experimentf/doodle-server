@@ -12,6 +12,7 @@ import { DoodleServerError } from '@/utils/error';
 import { hideWord } from '@/utils/game';
 import { fetchRandomWords } from '@/utils/words';
 
+import DoodlerServiceInstance from '../doodler/DoodlerService';
 import RoomServiceInstance from '../room/RoomService';
 import SocketServiceInstance from '../socket/SocketService';
 import { GameServiceInterface } from './interface';
@@ -71,17 +72,33 @@ class GameService implements GameServiceInterface {
     informAffectedClients = false,
     extraInfo?: { word: string }
   ) {
+    const respondExtraInfo: {
+      wordOptions?: Array<string>;
+      scores?: Array<[string, number]>;
+    } = {};
     const gameModel = await this._findGameModel(gameId);
+    const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     gameModel.setStatus(status);
+
     if (extraInfo?.word) {
       gameModel.updateOptions({ word: extraInfo.word });
     }
+
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
-    const wordOptions =
+    if (status === GameStatus.TURN_END) {
+      const scores = gameModel.calculateScoresByHunchTime();
+      respondExtraInfo.scores = scores;
+      await Promise.all(
+        scores.map(async ([doodlerId, score]) => {
+          await DoodlerServiceInstance.incrementScore(doodlerId, score);
+        })
+      );
+    }
+
+    respondExtraInfo.wordOptions =
       status === GameStatus.CHOOSE_WORD ? fetchRandomWords() : undefined;
 
     // Inform status change to invloved clients
-    const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     if (informAffectedClients) {
       if (status === GameStatus.GAME) {
         if (room.drawerId) {
@@ -94,7 +111,7 @@ class GameService implements GameServiceInterface {
               {
                 room,
                 game: hideWord(gameModel.json),
-                extraInfo: { wordOptions }
+                extraInfo: respondExtraInfo
               }
             ]
           );
@@ -102,7 +119,7 @@ class GameService implements GameServiceInterface {
           SocketServiceInstance.emitEvent(
             room.drawerId,
             GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-            [{ room, game: gameModel.json, extraInfo: { wordOptions } }]
+            [{ room, game: gameModel.json, extraInfo: respondExtraInfo }]
           );
         }
       } else {
@@ -113,9 +130,7 @@ class GameService implements GameServiceInterface {
             {
               room,
               game: gameModel.json,
-              extraInfo: {
-                wordOptions
-              }
+              extraInfo: respondExtraInfo
             }
           ]
         );
@@ -134,8 +149,10 @@ class GameService implements GameServiceInterface {
       gameModel.addDrawer(room.drawerId);
       gameModel.resetTimer();
       const randomWord = fetchRandomWords(1)[0];
-      const autoChoiceWord = wordOptions
-        ? wordOptions[Math.floor(Math.random() * wordOptions.length)]
+      const autoChoiceWord = respondExtraInfo.wordOptions
+        ? respondExtraInfo.wordOptions[
+            Math.floor(Math.random() * respondExtraInfo.wordOptions.length)
+          ]
         : randomWord;
 
       gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {
@@ -149,6 +166,7 @@ class GameService implements GameServiceInterface {
       gameModel.startTimer(
         gameModel.options.timers.turnEndCooldownTime.max,
         async () => {
+          gameModel.clearHunchTimes();
           const { drawerId: newDrawerId } =
             await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
           const isNewRoundRequired = gameModel.checkNewRound(newDrawerId);
@@ -188,6 +206,7 @@ class GameService implements GameServiceInterface {
         gameModel.options.timers.resultCooldownTime.max,
         async () => {
           gameModel.reset();
+          await RoomServiceInstance.resetScoreboard(gameModel.roomId);
           const isValid = await RoomServiceInstance.isValidGameRoom(
             gameModel.roomId
           );
@@ -238,6 +257,23 @@ class GameService implements GameServiceInterface {
     if (mismatchCharCount === 0) return HunchStatus.CORRECT;
     if (mismatchCharCount <= 2) return HunchStatus.NEARBY;
     return HunchStatus.WRONG;
+  };
+
+  /**
+   * Add a hunch time to a specific game for a specific doodler id
+   * @param gameId Game Id
+   * @param doodlerId Doodler ID for which hunch time is to added
+   */
+  public addHunchTime: GameServiceInterface['addHunchTime'] = async (
+    gameId,
+    doodlerId
+  ) => {
+    const gameModel = await this._findGameModel(gameId);
+    gameModel.addHunchTime(doodlerId, Date.now());
+    const room = await RoomServiceInstance.findRoom(gameModel.roomId);
+    // TODO : FIX THIS BUG LATER TO CHECK IF ALL HUNCHES ARE BY CURRENT PLAYERS ONLY
+    const shouldEndGame = gameModel.nHunches === room.doodlers.length - 1;
+    if (shouldEndGame) this.updateStatus(gameId, GameStatus.TURN_END, true);
   };
 
   // PRIVATE METHODS

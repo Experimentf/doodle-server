@@ -20,4 +20,5 @@ export interface GameServiceInterface {
 
   // SCORE
   getHunchStatus: (gameId: string, message: string) => Promise<HunchStatus>;
+  addHunchTime: (gameId: string, doodlerId: string) => Promise<void>;
 }

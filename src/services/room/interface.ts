@@ -26,4 +26,5 @@ export interface RoomServiceInterface {
     gameId: GameInterface['id']
   ) => Promise<RoomInterface>;
   changeDrawerTurn: (roomId: string) => Promise<RoomInterface>;
+  resetScoreboard: (roomId: string) => Promise<void>;
 }
