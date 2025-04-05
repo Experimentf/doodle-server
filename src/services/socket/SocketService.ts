@@ -29,11 +29,26 @@ class SocketService implements SocketServiceInterface {
   };
 
   /**
-   * Emit an event to client
+   * Emit an event to a single client or room
    */
-  public emitEventToClientRoom: SocketServiceInterface['emitEventToClientRoom'] =
-    (roomId, ev, payload) => {
-      this._io?.to(roomId).emit(ev, ...payload);
+  public emitEvent: SocketServiceInterface['emitEvent'] = (
+    socketId,
+    ev,
+    payload
+  ) => {
+    this._io?.to(socketId).emit(ev, ...payload);
+  };
+
+  /**
+   * Emit an event to a single client or room
+   */
+  public emitEventInRoomExceptOne: SocketServiceInterface['emitEventInRoomExceptOne'] =
+    (roomId, socketId, ev, payload) => {
+      const clients = this._io?.sockets.adapter.rooms.get(roomId);
+      if (!clients) return;
+      for (const client of clients) {
+        if (client !== socketId) this.emitEvent(client, ev, payload);
+      }
     };
 
   // PRIVATE METHODS

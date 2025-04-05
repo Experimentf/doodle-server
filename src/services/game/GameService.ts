@@ -9,6 +9,7 @@ import {
 } from '@/types/game';
 import { HunchStatus } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
+import { hideWord } from '@/utils/game';
 import { fetchRandomWords } from '@/utils/words';
 
 import RoomServiceInstance from '../room/RoomService';
@@ -82,19 +83,43 @@ class GameService implements GameServiceInterface {
     // Inform status change to invloved clients
     const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     if (informAffectedClients) {
-      SocketServiceInstance.emitEventToClientRoom(
-        gameModel.roomId,
-        GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-        [
-          {
-            room,
-            game: gameModel.json,
-            extraInfo: {
-              wordOptions
+      if (status === GameStatus.GAME) {
+        if (room.drawerId) {
+          // Send the hidden word for non-drawing clients
+          SocketServiceInstance.emitEventInRoomExceptOne(
+            room.id,
+            room.drawerId,
+            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+            [
+              {
+                room,
+                game: hideWord(gameModel.json),
+                extraInfo: { wordOptions }
+              }
+            ]
+          );
+          // Send the exact word for drawing client
+          SocketServiceInstance.emitEvent(
+            room.drawerId,
+            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+            [{ room, game: gameModel.json, extraInfo: { wordOptions } }]
+          );
+        }
+      } else {
+        SocketServiceInstance.emitEvent(
+          gameModel.roomId,
+          GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+          [
+            {
+              room,
+              game: gameModel.json,
+              extraInfo: {
+                wordOptions
+              }
             }
-          }
-        ]
-      );
+          ]
+        );
+      }
     }
 
     if (status === GameStatus.GAME) {
