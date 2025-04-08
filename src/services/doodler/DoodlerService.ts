@@ -70,6 +70,7 @@ class DoodlerService implements DoodlerServiceInterface {
   public async incrementScore(doodlerId: string, value: number) {
     const doodler = await this._findDooderModel(doodlerId);
     doodler.incrementScore(value);
+    console.log(doodler.score);
   }
 
   public async clearScore(doodlerId: string) {

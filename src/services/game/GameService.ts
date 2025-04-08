@@ -70,15 +70,15 @@ class GameService implements GameServiceInterface {
     gameId: string,
     status: GameStatus,
     informAffectedClients = false,
-    extraInfo?: { word: string }
+    options?: { word: string }
   ) {
     let statusChangeData: GameStatusChangeData = {};
     const gameModel = await this._findGameModel(gameId);
     const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     gameModel.setStatus(status);
 
-    if (extraInfo?.word) {
-      gameModel.updateOptions({ word: extraInfo.word });
+    if (options?.word) {
+      gameModel.updateOptions({ word: options.word });
     }
 
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
@@ -102,6 +102,20 @@ class GameService implements GameServiceInterface {
       statusChangeData = {
         [GameStatus.CHOOSE_WORD]: {
           wordOptions
+        }
+      };
+    }
+
+    if (status === GameStatus.RESULT) {
+      const results = Object.fromEntries(
+        (await DoodlerServiceInstance.getDoodlers(room.doodlers)).map((d) => [
+          d.id,
+          d.score
+        ])
+      );
+      statusChangeData = {
+        [GameStatus.RESULT]: {
+          results
         }
       };
     }

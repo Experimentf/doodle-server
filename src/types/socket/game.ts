@@ -26,7 +26,10 @@ export interface GameStatusChangeData {
     wordOptions: Array<string>;
   };
   [GameStatus.TURN_END]?: {
-    scores: Record<string, number>;
+    scores: Record<DoodlerInterface['id'], number>;
+  };
+  [GameStatus.RESULT]?: {
+    results: Record<DoodlerInterface['id'], number>;
   };
 }
 

@@ -16,7 +16,7 @@ export class DoodlerModel {
   }
 
   incrementScore(value: number) {
-    this._score = value;
+    this._score += value;
   }
 
   clearScore() {
