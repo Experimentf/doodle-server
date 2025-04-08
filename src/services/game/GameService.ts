@@ -7,7 +7,7 @@ import {
   GameOptions,
   GameStatus
 } from '@/types/game';
-import { HunchStatus } from '@/types/socket/game';
+import { GameStatusChangeData, HunchStatus } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
 import { hideWord } from '@/utils/game';
 import { fetchRandomWords } from '@/utils/words';
@@ -72,10 +72,7 @@ class GameService implements GameServiceInterface {
     informAffectedClients = false,
     extraInfo?: { word: string }
   ) {
-    const respondExtraInfo: {
-      wordOptions?: Array<string>;
-      scores?: Array<[string, number]>;
-    } = {};
+    let statusChangeData: GameStatusChangeData = {};
     const gameModel = await this._findGameModel(gameId);
     const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     gameModel.setStatus(status);
@@ -87,7 +84,11 @@ class GameService implements GameServiceInterface {
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
     if (status === GameStatus.TURN_END) {
       const scores = gameModel.calculateScoresByHunchTime();
-      respondExtraInfo.scores = scores;
+      statusChangeData = {
+        [GameStatus.TURN_END]: {
+          scores
+        }
+      };
       await Promise.all(
         scores.map(async ([doodlerId, score]) => {
           await DoodlerServiceInstance.incrementScore(doodlerId, score);
@@ -95,8 +96,14 @@ class GameService implements GameServiceInterface {
       );
     }
 
-    respondExtraInfo.wordOptions =
-      status === GameStatus.CHOOSE_WORD ? fetchRandomWords() : undefined;
+    if (status === GameStatus.CHOOSE_WORD) {
+      const wordOptions = fetchRandomWords();
+      statusChangeData = {
+        [GameStatus.CHOOSE_WORD]: {
+          wordOptions
+        }
+      };
+    }
 
     // Inform status change to invloved clients
     if (informAffectedClients) {
@@ -111,7 +118,7 @@ class GameService implements GameServiceInterface {
               {
                 room,
                 game: hideWord(gameModel.json),
-                extraInfo: respondExtraInfo
+                statusChangeData
               }
             ]
           );
@@ -119,7 +126,7 @@ class GameService implements GameServiceInterface {
           SocketServiceInstance.emitEvent(
             room.drawerId,
             GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-            [{ room, game: gameModel.json, extraInfo: respondExtraInfo }]
+            [{ room, game: gameModel.json, statusChangeData }]
           );
         }
       } else {
@@ -130,7 +137,7 @@ class GameService implements GameServiceInterface {
             {
               room,
               game: gameModel.json,
-              extraInfo: respondExtraInfo
+              statusChangeData
             }
           ]
         );
@@ -149,10 +156,9 @@ class GameService implements GameServiceInterface {
       gameModel.addDrawer(room.drawerId);
       gameModel.resetTimer();
       const randomWord = fetchRandomWords(1)[0];
-      const autoChoiceWord = respondExtraInfo.wordOptions
-        ? respondExtraInfo.wordOptions[
-            Math.floor(Math.random() * respondExtraInfo.wordOptions.length)
-          ]
+      const wordOptions = statusChangeData[GameStatus.CHOOSE_WORD]?.wordOptions;
+      const autoChoiceWord = wordOptions
+        ? wordOptions[Math.floor(Math.random() * wordOptions.length)]
         : randomWord;
 
       gameModel.startTimer(gameModel.options.timers.chooseWordTime.max, () => {

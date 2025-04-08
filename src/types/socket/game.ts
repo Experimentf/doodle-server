@@ -1,7 +1,7 @@
 import { GameSocketEvents } from '@/constants/events/socket';
 import GameModel from '@/models/GameModel';
 
-import { CanvasOperation } from '../game';
+import { CanvasOperation, GameStatus } from '../game';
 import { DoodlerInterface } from './doodler';
 import { ClientToServerEventsArgument } from './helper';
 import { RoomInterface } from './room';
@@ -19,6 +19,15 @@ export interface HunchInterface {
   message: string;
   status?: HunchStatus;
   isSystemMessage: boolean;
+}
+
+export interface GameStatusChangeData {
+  [GameStatus.CHOOSE_WORD]?: {
+    wordOptions: Array<string>;
+  };
+  [GameStatus.TURN_END]?: {
+    scores: Array<[string, number]>;
+  };
 }
 
 export interface GameClientToServerEventsArgumentMap {
@@ -49,10 +58,7 @@ export interface GameServerToClientEvents {
   [GameSocketEvents.EMIT_GAME_STATUS_UPDATED]: (args: {
     room: RoomInterface;
     game?: GameInterface;
-    extraInfo?: {
-      wordOptions?: Array<string>;
-      scores?: Array<[string, number]>;
-    };
+    statusChangeData?: GameStatusChangeData;
   }) => void;
   [GameSocketEvents.EMIT_GAME_CANVAS_OPERATION]: (args: {
     canvasOperation: CanvasOperation;
