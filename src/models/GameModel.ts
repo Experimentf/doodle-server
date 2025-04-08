@@ -74,7 +74,7 @@ class GameModel {
   }
 
   public calculateScoresByHunchTime() {
-    const scores: Array<[string, number]> = [];
+    const scores: Record<string, number> = {};
     if (this.nHunches === 0) return scores;
     const sortedHunchTimes = [...this._hunchTimes].sort((a, b) => a[1] - b[1]);
     const maxScore = 100;
@@ -89,7 +89,7 @@ class GameModel {
       const relativeTimeDifference =
         (time - minTimestamp) / (timeRange != 0 ? timeRange : 1);
       const score = ((1 - relativeTimeDifference) / 2 + 0.5) * maxScore;
-      scores.push([id, Math.floor(score)]);
+      scores[id] = Math.floor(score);
     });
     return scores;
   }

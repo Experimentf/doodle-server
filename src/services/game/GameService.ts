@@ -90,7 +90,8 @@ class GameService implements GameServiceInterface {
         }
       };
       await Promise.all(
-        scores.map(async ([doodlerId, score]) => {
+        Object.keys(scores).map(async (doodlerId) => {
+          const score = scores[doodlerId];
           await DoodlerServiceInstance.incrementScore(doodlerId, score);
         })
       );
