@@ -2,8 +2,6 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",
-    "rootDir": ".",
-    "baseUrl": ".",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "outDir": "./dist",
@@ -12,7 +10,7 @@
     "strict": true,
     "skipLibCheck": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"]
