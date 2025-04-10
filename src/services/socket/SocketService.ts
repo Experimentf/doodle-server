@@ -67,6 +67,11 @@ class SocketService implements SocketServiceInterface {
       SocketEvents.ON_DISCONNECT,
       this._controller.handleSocketOnDisconnect(socket)
     );
+    this._registerReservedEvent(
+      socket,
+      SocketEvents.ON_ERROR,
+      this._controller.handleSocketOnDisconnect(socket)
+    );
   }
 
   /**

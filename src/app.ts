@@ -24,13 +24,15 @@ const io = new Server<
   ServerToClientEvents,
   InterServerEvents,
   SocketData
->(httpServer, { cors: { origin: '*' } });
+>(httpServer, {
+  cors: { origin: 'http://dclient:3000', methods: ['GET', 'post'] }
+});
 
 // Start the socket service
 SocketServiceInstance.start(io);
 
 // Listen to port
-const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 5000;
+httpServer.listen(PORT, '0.0.0.0', undefined, () => {
   console.log(`Server is listening on port ${PORT}`);
 });

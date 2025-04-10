@@ -70,6 +70,15 @@ class SocketController implements SocketControllerInterface {
     (socket) => async () => {
       console.log('User disconnected :', socket.id);
     };
+
+  /**
+   *
+   * Handle socker connect error
+   */
+  public handleSocketOnError: SocketControllerInterface['handleSocketOnError'] =
+    (socket) => async () => {
+      console.log('Connection error:', socket);
+    };
 }
 
 export default SocketController;

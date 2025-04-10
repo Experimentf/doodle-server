@@ -5,7 +5,8 @@
 
 export enum SocketEvents {
   ON_DISCONNECTING = 'disconnecting',
-  ON_DISCONNECT = 'disconnect'
+  ON_DISCONNECT = 'disconnect',
+  ON_ERROR = 'error'
 }
 
 export enum RoomSocketEvents {
