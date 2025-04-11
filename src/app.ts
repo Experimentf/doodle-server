@@ -1,3 +1,4 @@
+import cors from 'cors';
 import { config } from 'dotenv';
 import express, { Application } from 'express';
 import { createServer } from 'http';
@@ -18,6 +19,27 @@ const app: Application = express();
 
 const httpServer = createServer(app);
 
+const allowedOrigins = [
+  process.env.DOODLE_CLIENT_URL,
+  process.env.NETLIFY_DOODLE_CLIENT_URL
+];
+
+const isOriginAllowed = (origin?: string) =>
+  origin && allowedOrigins.includes(origin);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
+  })
+);
+
 // Socket
 const io = new Server<
   ClientToServerEvents,
@@ -26,7 +48,13 @@ const io = new Server<
   SocketData
 >(httpServer, {
   cors: {
-    origin: process.env.DOODLE_CLIENT_URL,
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'post']
   }
 });
