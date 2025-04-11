@@ -25,14 +25,17 @@ const io = new Server<
   InterServerEvents,
   SocketData
 >(httpServer, {
-  cors: { origin: 'http://dclient:3000', methods: ['GET', 'post'] }
+  cors: {
+    origin: process.env.DOODLE_CLIENT_URL,
+    methods: ['GET', 'post']
+  }
 });
 
 // Start the socket service
 SocketServiceInstance.start(io);
 
 // Listen to port
-const PORT = Number(process.env.PORT) || 5000;
-httpServer.listen(PORT, '0.0.0.0', undefined, () => {
+const PORT = process.env.PORT || 5000;
+httpServer.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
