@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --watch './src/**/*' --exec \"npx ts-node -r tsconfig-paths/register\" ./src/app.ts",
-    "start": "npm run build && node -r module-alias/register dist/src/app.js",
+    "start": "npm run build && node -r module-alias/register dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -52,6 +52,6 @@
     ]
   },
   "_moduleAliases": {
-    "@": "dist/src"
+    "@": "dist"
   }
 }
