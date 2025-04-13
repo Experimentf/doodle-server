@@ -58,7 +58,20 @@ class RoomController implements RoomControllerInterface {
    * Handle when the client wants to create a private room
    */
   public handleRoomOnCreatePrivateRoom: RoomControllerInterface['handleRoomOnCreatePrivateRoom'] =
-    (socket) => async (_payload, _respond) => {};
+    (socket) => async (_, respond) => {
+      const doodler = await DoodlerServiceInstance.findDooder(socket.id);
+      const { id: roomId } = await RoomServiceInstance.createRoom(doodler.id);
+      const gameInterface = await GameServiceInstance.createGame(roomId);
+      await RoomServiceInstance.assignGameToRoom(roomId, gameInterface.id);
+      socket.join(roomId);
+      await RoomServiceInstance.changeDrawerTurn(roomId, true);
+      await GameServiceInstance.updateStatus(
+        gameInterface.id,
+        GameStatus.LOBBY,
+        true
+      );
+      respond({ data: { roomId } });
+    };
 
   /**
    * Handle when the client wants to get room details

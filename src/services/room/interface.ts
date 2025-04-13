@@ -4,6 +4,7 @@ import { RoomInterface } from '@/types/socket/room';
 
 export interface RoomServiceInterface {
   // FUNDAMENTALS
+  createRoom: (ownerId?: string) => Promise<RoomInterface>;
   isValidGameRoom: (roomId: string) => Promise<boolean>;
   findRoom: (roomId: string) => Promise<RoomInterface>;
 
@@ -13,6 +14,10 @@ export interface RoomServiceInterface {
     doodlerId: string
   ) => Promise<RoomInterface>;
   assignDoodlerToPublicRoom: (
+    doodlerId: DoodlerInterface['id']
+  ) => Promise<RoomInterface>;
+  assignDoodlerToPrivateRoom: (
+    roomId: string,
     doodlerId: DoodlerInterface['id']
   ) => Promise<RoomInterface>;
   removeDoodlerFromRoom: (

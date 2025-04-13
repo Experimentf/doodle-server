@@ -11,6 +11,18 @@ class RoomService implements RoomServiceInterface {
   private _rooms: RoomInfoMapType = new Map<string, RoomModel>(); // ROOM ID -> ROOM DETAILS
 
   /**
+   * Create a new room
+   * @param ownerId - Doodler ID who is the owner of this new room. If undefined, the room will be public.
+   * @returns Room Interface of the newly created room
+   */
+  public async createRoom(ownerId?: string) {
+    const room = new RoomModel(ownerId);
+    this._rooms.set(room.id, room);
+    if (ownerId) room.addDoodler(ownerId);
+    return room.json;
+  }
+
+  /**
    *
    * @param roomId RoomID to check validity for game
    * @returns true if valid, false if invalid
@@ -67,11 +79,25 @@ class RoomService implements RoomServiceInterface {
     if (roomInterface !== undefined) return roomInterface;
 
     // Create a new public room if doodler could not be assigned
-    const roomModel = await this._createRoom();
+    const roomModel = await this._createRoomModel();
 
     // Assign doodler to the newly created room
-    await this._addDoodlerToRoom(roomModel.id, doodlerId);
+    const isAdded = roomModel.addDoodler(doodlerId);
+    if (!isAdded) throw new DoodleServerError('Could not add!');
     return roomModel.json;
+  }
+
+  /**
+   * Assigms a doodler to a public room
+   * @param doodler
+   * @returns
+   */
+  public async assignDoodlerToPrivateRoom(roomId: string, doodlerId: string) {
+    const room = await this._findRoomModel(roomId);
+    if (!room.isPrivate) throw new DoodleServerError('Invalid room!');
+    const isDoodlerAdded = room.addDoodler(doodlerId);
+    if (isDoodlerAdded) return room.json;
+    else throw new DoodleServerError('Invalid room!');
   }
 
   /**
@@ -136,9 +162,9 @@ class RoomService implements RoomServiceInterface {
   /**
    * Create a new room
    * @param ownerId - Doodler ID who is the owner of this new room. If undefined, the room will be public.
-   * @returns Room ID of the newly created room
+   * @returns Room model of the newly created room
    */
-  private async _createRoom(ownerId?: string) {
+  private async _createRoomModel(ownerId?: string) {
     const room = new RoomModel(ownerId);
     this._rooms.set(room.id, room);
     return room;
@@ -153,18 +179,6 @@ class RoomService implements RoomServiceInterface {
     const roomModel = this._rooms.get(roomId);
     if (!roomModel) throw new DoodleServerError('Room not found');
     return roomModel;
-  }
-
-  /**
-   * Add a doodler to a room
-   * @param roomId Room ID of the room in which a doodler is to be added
-   * @param doodler Doodler to be added to the room
-   * @returns true if success, false if failure
-   */
-  private async _addDoodlerToRoom(roomId: string, doodlerId: string) {
-    const roomModel = await this._findRoomModel(roomId);
-    const isAdded = roomModel.addDoodler(doodlerId);
-    return isAdded;
   }
 
   /**
