@@ -235,7 +235,7 @@ class GameService implements GameServiceInterface {
           const isValid = await RoomServiceInstance.isValidGameRoom(
             gameModel.roomId
           );
-          if (isValid) {
+          if (isValid && !room.isPrivate) {
             await RoomServiceInstance.changeDrawerTurn(gameModel.roomId);
             this.updateStatus(gameId, GameStatus.ROUND_START, true);
           } else {
@@ -270,6 +270,7 @@ class GameService implements GameServiceInterface {
   public async setDefaultOptions(gameId: string, options: PrivateGameOptions) {
     const gameModel = await this._findGameModel(gameId);
     gameModel.setDefaultOptions(options);
+    gameModel.reset();
     return gameModel.json;
   }
 

@@ -32,7 +32,8 @@ class GameModel {
     this.clearHunchTimes();
     this.clearCanvasOperations();
     this.resetTimer();
-    this._options = JSON.parse(JSON.stringify(DEFAULT_GAME_OPTIONS));
+    this._previousDrawerSet.clear();
+    this._options = JSON.parse(JSON.stringify(this._defaultOptions));
   }
 
   // Options
@@ -55,12 +56,17 @@ class GameModel {
   }
 
   public setDefaultOptions(options: PrivateGameOptions) {
-    this._defaultOptions.round.max = options.round;
-    this._defaultOptions.timers.drawing.max = options.drawing;
+    this._defaultOptions.round.max = Number(options.round);
+    this._defaultOptions.timers.drawing.max = Number(options.drawing);
+    this._options = JSON.parse(JSON.stringify(this._defaultOptions));
   }
 
   public checkNewRound(drawerId?: string) {
-    return drawerId && this._previousDrawerSet.has(drawerId);
+    return (
+      drawerId !== undefined &&
+      drawerId.length > 0 &&
+      this._previousDrawerSet.has(drawerId)
+    );
   }
 
   // Hunch Time
@@ -142,7 +148,7 @@ class GameModel {
 
   // PRIVATE METHODS
   private _createOptions(options?: Partial<GameOptions>) {
-    const newOptions = { ...this._defaultOptions };
+    const newOptions = JSON.parse(JSON.stringify(this._defaultOptions));
     if (options?.round?.max) newOptions.round.max = options.round.max;
     if (options?.timers?.drawing?.max)
       newOptions.timers.drawing.max = options.timers.drawing.max;
