@@ -33,4 +33,11 @@ export interface GameControllerInterface {
       ClientToServerEvents[GameSocketEvents.ON_GAME_START_PRIVATE_GAME]
     >
   ) => void;
+  handleGameOnUpdatePrivateSetting: (
+    socket: SocketType
+  ) => (
+    ...args: Parameters<
+      ClientToServerEvents[GameSocketEvents.ON_GAME_UPDATE_PRIVATE_SETTING]
+    >
+  ) => void;
 }

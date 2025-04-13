@@ -29,7 +29,9 @@ export enum GameSocketEvents {
   ON_GAME_CHOOSE_WORD = 'game-choose-word',
   ON_GAME_HUNCH = 'game-hunch',
   ON_GAME_START_PRIVATE_GAME = 'game-start-private-game',
+  ON_GAME_UPDATE_PRIVATE_SETTING = 'game-update-private-setting',
   EMIT_GAME_STATUS_UPDATED = 'game-status-updated',
   EMIT_GAME_CANVAS_OPERATION = 'game-canvas-operation',
-  EMIT_GAME_HUNCH = 'game-hunch'
+  EMIT_GAME_HUNCH = 'game-hunch',
+  EMIT_GAME_UPDATE_PRIVATE_SETTING = 'game-update-private-setting'
 }

@@ -64,6 +64,10 @@ export interface GameClientToServerEventsArgumentMap {
     { roomId: string; options: PrivateGameOptions },
     { game: GameInterface }
   >;
+  [GameSocketEvents.ON_GAME_UPDATE_PRIVATE_SETTING]: ClientToServerEventsArgument<
+    { roomId: string; options: PrivateGameOptions },
+    { game: GameInterface }
+  >;
 }
 
 export interface GameServerToClientEvents {
@@ -75,5 +79,8 @@ export interface GameServerToClientEvents {
   [GameSocketEvents.EMIT_GAME_CANVAS_OPERATION]: (args: {
     canvasOperation: CanvasOperation;
   }) => void;
-  [GameSocketEvents.ON_GAME_HUNCH]: (args: { hunch: HunchInterface }) => void;
+  [GameSocketEvents.EMIT_GAME_HUNCH]: (args: { hunch: HunchInterface }) => void;
+  [GameSocketEvents.EMIT_GAME_UPDATE_PRIVATE_SETTING]: (args: {
+    options: PrivateGameOptions;
+  }) => void;
 }

@@ -158,6 +158,14 @@ class GameController implements GameControllerInterface {
       );
       respond({ data: { game } });
     };
+
+  public handleGameOnUpdatePrivateSetting: GameControllerInterface['handleGameOnUpdatePrivateSetting'] =
+    (socket) => (payload) => {
+      const { roomId, options } = payload;
+      socket
+        .to(roomId)
+        .emit(GameSocketEvents.EMIT_GAME_UPDATE_PRIVATE_SETTING, { options });
+    };
 }
 
 export default GameController;

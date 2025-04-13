@@ -150,6 +150,11 @@ class SocketService implements SocketServiceInterface {
       GameSocketEvents.ON_GAME_START_PRIVATE_GAME,
       this._controller.handleGameOnStartPrivateGame(socket)
     );
+    this._registerCustomSocketEvent(
+      socket,
+      GameSocketEvents.ON_GAME_UPDATE_PRIVATE_SETTING,
+      this._controller.handleGameOnUpdatePrivateSetting(socket)
+    );
   }
 
   /**
