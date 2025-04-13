@@ -1,5 +1,9 @@
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
-import { GameInterface, HunchStatus } from '@/types/socket/game';
+import {
+  GameInterface,
+  HunchStatus,
+  PrivateGameOptions
+} from '@/types/socket/game';
 
 export interface GameServiceInterface {
   // FUNDAMENTALS
@@ -16,6 +20,10 @@ export interface GameServiceInterface {
   updateCanvasOperations: (
     gameId: string,
     canvasOperation: CanvasOperation
+  ) => Promise<GameInterface>;
+  setDefaultOptions: (
+    gameId: string,
+    options: PrivateGameOptions
   ) => Promise<GameInterface>;
 
   // SCORE

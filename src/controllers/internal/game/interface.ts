@@ -26,4 +26,11 @@ export interface GameControllerInterface {
   ) => (
     ...args: Parameters<ClientToServerEvents[GameSocketEvents.ON_GAME_HUNCH]>
   ) => void;
+  handleGameOnStartPrivateGame: (
+    socket: SocketType
+  ) => (
+    ...args: Parameters<
+      ClientToServerEvents[GameSocketEvents.ON_GAME_START_PRIVATE_GAME]
+    >
+  ) => void;
 }

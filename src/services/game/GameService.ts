@@ -7,7 +7,11 @@ import {
   GameOptions,
   GameStatus
 } from '@/types/game';
-import { GameStatusChangeData, HunchStatus } from '@/types/socket/game';
+import {
+  GameStatusChangeData,
+  HunchStatus,
+  PrivateGameOptions
+} from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
 import { hideWord } from '@/utils/game';
 import { fetchRandomWords } from '@/utils/words';
@@ -255,6 +259,17 @@ class GameService implements GameServiceInterface {
   ) {
     const gameModel = await this._findGameModel(gameId);
     gameModel.addCanvasOperation(canvasOperation);
+    return gameModel.json;
+  }
+
+  /**
+   *
+   * @param gameId Game Id
+   * @param options Private game options selected by the owner
+   */
+  public async setDefaultOptions(gameId: string, options: PrivateGameOptions) {
+    const gameModel = await this._findGameModel(gameId);
+    gameModel.setDefaultOptions(options);
     return gameModel.json;
   }
 

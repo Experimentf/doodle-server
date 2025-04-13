@@ -1,5 +1,6 @@
 import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
+import { PrivateGameOptions } from '@/types/socket/game';
 import Stack from '@/utils/stack';
 import { generateId } from '@/utils/unique';
 
@@ -10,9 +11,10 @@ import { generateId } from '@/utils/unique';
 class GameModel {
   public readonly id: string;
   private _status: GameStatus = GameStatus.LOBBY;
-  private _options: GameOptions = JSON.parse(
+  private _defaultOptions: GameOptions = JSON.parse(
     JSON.stringify(DEFAULT_GAME_OPTIONS)
   );
+  private _options: GameOptions = this._defaultOptions;
   private _canvasOperationsStack = new Stack<CanvasOperation>();
   private _timer: NodeJS.Timer | null = null;
   private _roomId: string;
@@ -38,10 +40,6 @@ class GameModel {
     return this._options;
   }
 
-  public setOptions(options: Partial<GameOptions>) {
-    this._options = this._createOptions(options);
-  }
-
   public updateOptions(options: Partial<GameOptions>) {
     this._options = { ...this._options, ...options };
   }
@@ -54,6 +52,11 @@ class GameModel {
   public incrementRound() {
     this._options.round.current += 1;
     this._previousDrawerSet.clear();
+  }
+
+  public setDefaultOptions(options: PrivateGameOptions) {
+    this._defaultOptions.round.max = options.round;
+    this._defaultOptions.timers.drawing.max = options.drawing;
   }
 
   public checkNewRound(drawerId?: string) {
@@ -139,7 +142,7 @@ class GameModel {
 
   // PRIVATE METHODS
   private _createOptions(options?: Partial<GameOptions>) {
-    const newOptions = JSON.parse(JSON.stringify(DEFAULT_GAME_OPTIONS));
+    const newOptions = { ...this._defaultOptions };
     if (options?.round?.max) newOptions.round.max = options.round.max;
     if (options?.timers?.drawing?.max)
       newOptions.timers.drawing.max = options.timers.drawing.max;

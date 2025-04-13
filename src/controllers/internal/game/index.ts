@@ -117,6 +117,45 @@ class GameController implements GameControllerInterface {
       respond({ data: { hunch } });
       return;
     };
+
+  /**
+   * Handle when a private room owner starts the game
+   */
+  public handleGameOnStartPrivateGame: GameControllerInterface['handleGameOnStartPrivateGame'] =
+    (socket) => async (payload, respond) => {
+      const { roomId, options } = payload;
+      const room = await RoomServiceInstance.findRoomWithDoodler(
+        roomId,
+        socket.id
+      );
+
+      // If socket is not the owner of the room, socket cannot start the game
+      if (room.ownerId !== socket.id) {
+        throw new DoodleServerError('Invalid action!');
+      }
+
+      // If room has less than 2 players, game can not be started
+      if (room.doodlers.length < 2) {
+        socket.emit(GameSocketEvents.EMIT_GAME_HUNCH, {
+          hunch: {
+            isSystemMessage: true,
+            message: 'Atleast 2 players are required to start a game!'
+          }
+        });
+        throw new DoodleServerError('Insufficient players!');
+      }
+
+      if (!room.gameId) {
+        throw new DoodleServerError('Invalid game!');
+      }
+      await GameServiceInstance.setDefaultOptions(room.gameId, options);
+      const game = await GameServiceInstance.updateStatus(
+        room.gameId,
+        GameStatus.CHOOSE_WORD,
+        true
+      );
+      respond({ data: { game } });
+    };
 }
 
 export default GameController;

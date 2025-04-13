@@ -33,6 +33,11 @@ export interface GameStatusChangeData {
   };
 }
 
+export interface PrivateGameOptions {
+  drawing: number;
+  round: number;
+}
+
 export interface GameClientToServerEventsArgumentMap {
   [GameSocketEvents.ON_GET_GAME]: ClientToServerEventsArgument<
     string,
@@ -54,6 +59,10 @@ export interface GameClientToServerEventsArgumentMap {
     {
       hunch: HunchInterface;
     }
+  >;
+  [GameSocketEvents.ON_GAME_START_PRIVATE_GAME]: ClientToServerEventsArgument<
+    { roomId: string; options: PrivateGameOptions },
+    { game: GameInterface }
   >;
 }
 

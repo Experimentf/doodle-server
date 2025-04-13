@@ -68,7 +68,9 @@ class SocketController implements SocketControllerInterface {
    */
   public handleSocketOnDisconnect: SocketControllerInterface['handleSocketOnDisconnect'] =
     (socket) => async () => {
-      console.log('User disconnected :', socket.id);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('User disconnected :', socket.id);
+      }
     };
 
   /**

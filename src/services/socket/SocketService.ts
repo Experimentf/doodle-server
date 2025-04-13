@@ -20,7 +20,9 @@ class SocketService implements SocketServiceInterface {
   public start: SocketServiceInterface['start'] = (io) => {
     this._io = io;
     io.on('connection', (socket) => {
-      console.log('User connected :', socket.id);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('User connected :', socket.id);
+      }
       this._registerSocketReservedEvents(socket);
       this._registerDoodlerSocketEvents(socket);
       this._registerRoomSocketEvents(socket);
@@ -142,6 +144,11 @@ class SocketService implements SocketServiceInterface {
       socket,
       GameSocketEvents.ON_GAME_HUNCH,
       this._controller.handleGameOnGameHunch(socket)
+    );
+    this._registerCustomSocketEvent(
+      socket,
+      GameSocketEvents.ON_GAME_START_PRIVATE_GAME,
+      this._controller.handleGameOnStartPrivateGame(socket)
     );
   }
 
