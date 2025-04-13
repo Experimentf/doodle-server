@@ -106,7 +106,7 @@ class SocketService implements SocketServiceInterface {
     this._registerCustomSocketEvent(
       socket,
       RoomSocketEvents.ON_ADD_DOODLER_TO_PRIVATE_ROOM,
-      this._controller.handleRoomOnAddDoodlerToPublicRoom(socket)
+      this._controller.handleRoomOnAddDoodlerToPrivateRoom(socket)
     );
     this._registerCustomSocketEvent(
       socket,

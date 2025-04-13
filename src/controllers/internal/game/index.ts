@@ -149,6 +149,7 @@ class GameController implements GameControllerInterface {
         throw new DoodleServerError('Invalid game!');
       }
       await GameServiceInstance.setDefaultOptions(room.gameId, options);
+      await RoomServiceInstance.changeDrawerTurn(roomId);
       const game = await GameServiceInstance.updateStatus(
         room.gameId,
         GameStatus.CHOOSE_WORD,

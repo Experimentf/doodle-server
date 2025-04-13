@@ -52,7 +52,19 @@ class RoomController implements RoomControllerInterface {
    * Handle when the client wants to be added to a private room
    */
   public handleRoomOnAddDoodlerToPrivateRoom: RoomControllerInterface['handleRoomOnAddDoodlerToPrivateRoom'] =
-    (socket) => async (_payload, _respond) => {};
+    (socket) => async (payload, respond) => {
+      const { roomId } = payload;
+      const doodler = await DoodlerServiceInstance.findDooder(socket.id);
+      const room = await RoomServiceInstance.assignDoodlerToPrivateRoom(
+        roomId,
+        doodler.id
+      );
+
+      // Join the new room
+      socket.join(roomId);
+      socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_JOIN, { doodler });
+      respond({ data: { room } });
+    };
 
   /**
    * Handle when the client wants to create a private room
