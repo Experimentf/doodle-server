@@ -1,4 +1,5 @@
 import { GameSocketEvents } from '@/constants/events/socket';
+import { MINIMUM_VALID_SIZE } from '@/constants/game';
 import DoodlerServiceInstance from '@/services/doodler/DoodlerService';
 import GameServiceInstance from '@/services/game/GameService';
 import RoomServiceInstance from '@/services/room/RoomService';
@@ -135,11 +136,11 @@ class GameController implements GameControllerInterface {
       }
 
       // If room has less than 2 players, game can not be started
-      if (room.doodlers.length < 2) {
+      if (room.doodlers.length < MINIMUM_VALID_SIZE) {
         socket.emit(GameSocketEvents.EMIT_GAME_HUNCH, {
           hunch: {
             isSystemMessage: true,
-            message: 'Atleast 2 players are required to start a game!'
+            message: `Atleast ${MINIMUM_VALID_SIZE} players are required to start a game!`
           }
         });
         throw new DoodleServerError('Insufficient players!');

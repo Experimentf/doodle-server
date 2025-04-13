@@ -1,6 +1,6 @@
 import { GameOptions } from '@/types/game';
 
-export const DEFAULT_CAPACITY = 3;
+export const DEFAULT_CAPACITY = 8;
 export const MINIMUM_VALID_SIZE = 2;
 
 export const DEFAULT_MAX_ROUNDS = 3;
