@@ -4,6 +4,12 @@
 
 The Doodle server powers the real-time, multiplayer gameplay of the Doodle app. It handles communication between players using **Socket.IO**, ensures synchronization of the game state, and implements core game logic.
 
+_The client side code can be found at https://github.com/Experimentf/doodle-client_
+
+### Sneak Peek
+![ezgif-899f7b2c9f51ab](https://github.com/user-attachments/assets/0e1b109d-5a67-417e-a1c6-7c5d38b79e8c)
+
+
 ---
 
 ## 🚀 Features
