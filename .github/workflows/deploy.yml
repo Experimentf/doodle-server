@@ -25,7 +25,7 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Authorize
+      - name: Deploy
         uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         with:
           host: ${{ secrets.DEPLOY_HOST_PATH }}
@@ -35,4 +35,4 @@ jobs:
             docker pull ghcr.io/experimentf/doodle-server:${{ github.sha }}
             docker stop doodle-server || true
             docker rm doodle-server || true
-            docker run -d --name doodle-server --restart unless-stopped -p 5000:5000 --env-file .env.production ghcr.io/experimentf/doodle-server:${{ github.sha }}
+            docker run -d --name doodle-server --restart unless-stopped -p 5000:5000 --env-file /root/doodle-server/.env.production ghcr.io/experimentf/doodle-server:${{ github.sha }}
