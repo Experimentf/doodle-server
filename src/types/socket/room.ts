@@ -23,6 +23,10 @@ export interface RoomClientToServerEventsArgumentMap {
     string,
     { room: RoomInterface; doodlers: DoodlerInterface[] }
   >;
+  [RoomSocketEvents.ON_LEAVE_ROOM]: ClientToServerEventsArgument<
+    { roomId: RoomInterface['id'] },
+    { success: true }
+  >;
 }
 
 export interface RoomServerToClientEvents {
@@ -30,6 +34,6 @@ export interface RoomServerToClientEvents {
     doodler: DoodlerInterface;
   }) => void;
   [RoomSocketEvents.EMIT_DOODLER_LEAVE]: (args: {
-    doodlerId: DoodlerInterface['id'];
+    doodler: DoodlerInterface;
   }) => void;
 }

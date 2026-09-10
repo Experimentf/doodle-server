@@ -6,7 +6,7 @@ import RoomServiceInstance from '@/services/room/RoomService';
 import { GameStatus } from '@/types/game';
 import { HunchStatus } from '@/types/socket/game';
 import { DoodleServerError } from '@/utils/error';
-import { createHunch } from '@/utils/game';
+import { createHunch, hideWord } from '@/utils/game';
 
 import { GameControllerInterface } from './interface';
 
@@ -17,17 +17,19 @@ class GameController implements GameControllerInterface {
    * @param respond
    */
   public handleGameOnGetGame: GameControllerInterface['handleGameOnGetGame'] =
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_socket) => async (payload, respond) => {
-      const gameId = payload;
-      const game = await GameServiceInstance.findGame(gameId);
-      // const { data: isValidGameData } = GameService.isValidGame(roomId);
-      // // TODO: Check for room is public
-      // if (isValidGameData) {
-      //   GameServiceInstance.startGame(roomId);
-      // }
+    (socket) => async (payload, respond) => {
+      const { roomId } = payload;
+      const room = await RoomServiceInstance.findRoomWithDoodler(
+        roomId,
+        socket.id
+      );
+      if (!room.gameId) throw new DoodleServerError('Game not found!');
+      const game = await GameServiceInstance.findGame(room.gameId);
 
-      respond({ data: { game } });
+      // Only the drawer should see the actual word - everyone else gets it
+      // masked, same as the status-change broadcast in GameService does.
+      const isDrawer = room.drawerId === socket.id;
+      respond({ data: { game: isDrawer ? game : hideWord(game) } });
     };
 
   /**

@@ -98,6 +98,83 @@ class RoomController implements RoomControllerInterface {
       const doodlers = await DoodlerServiceInstance.getDoodlers(room.doodlers);
       respond({ data: { room, doodlers } });
     };
+
+  /**
+   * Handle when the client explicitly leaves a room
+   */
+  public handleRoomOnLeaveRoom: RoomControllerInterface['handleRoomOnLeaveRoom'] =
+    (socket) => async (payload, respond) => {
+      const { roomId } = payload;
+      const doodlerId = socket.id;
+      const doodler = await DoodlerServiceInstance.findDooder(doodlerId);
+
+      const roomBeforeRemoval = await RoomServiceInstance.findRoomWithDoodler(
+        roomId,
+        doodlerId
+      );
+
+      // Remove doodler from their room
+      const room = await RoomServiceInstance.removeDoodlerFromRoom(
+        roomId,
+        doodlerId
+      );
+      socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_LEAVE, {
+        doodler
+      });
+      socket.leave(roomId);
+
+      // Check for game validity in the room after removing the doodler
+      const isValidGameRoom = await RoomServiceInstance.isValidGameRoom(roomId);
+
+      // Delete the game if room was deleted
+      if (!room && roomBeforeRemoval.gameId) {
+        await GameServiceInstance.deleteGame(roomBeforeRemoval.gameId);
+      }
+
+      // Update the game status if room exists and the game is not valid anymore
+      if (!isValidGameRoom && room) {
+        const game = !room.gameId
+          ? undefined
+          : await GameServiceInstance.updateStatus(
+              room.gameId,
+              GameStatus.RESULT
+            );
+        const updatedRoom = await RoomServiceInstance.changeDrawerTurn(
+          roomId,
+          true
+        );
+        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_STATUS_UPDATED, {
+          room: updatedRoom,
+          game
+        });
+      } else if (
+        isValidGameRoom &&
+        room &&
+        roomBeforeRemoval.gameId &&
+        roomBeforeRemoval.drawerId === doodlerId
+      ) {
+        // The drawer left mid-turn - end it immediately instead of leaving
+        // everyone else waiting out the full choose-word/drawing timers with
+        // a drawer who's no longer here. The existing turn-end cooldown then
+        // advances to the next drawer as normal.
+        const game = await GameServiceInstance.findGame(
+          roomBeforeRemoval.gameId
+        );
+        if (
+          game.status === GameStatus.CHOOSE_WORD ||
+          game.status === GameStatus.GAME ||
+          game.status === GameStatus.ROUND_START
+        ) {
+          await GameServiceInstance.updateStatus(
+            roomBeforeRemoval.gameId,
+            GameStatus.TURN_END,
+            true
+          );
+        }
+      }
+
+      respond({ data: { success: true } });
+    };
 }
 
 export default RoomController;

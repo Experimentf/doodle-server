@@ -118,6 +118,11 @@ class SocketService implements SocketServiceInterface {
       RoomSocketEvents.ON_GET_ROOM,
       this._controller.handleRoomOnGetRoom(socket)
     );
+    this._registerCustomSocketEvent(
+      socket,
+      RoomSocketEvents.ON_LEAVE_ROOM,
+      this._controller.handleRoomOnLeaveRoom(socket)
+    );
   }
 
   /**

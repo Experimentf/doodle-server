@@ -17,6 +17,7 @@ class SocketController implements SocketControllerInterface {
       Promise.all(
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
+          const doodler = await DoodlerServiceInstance.findDooder(doodlerId);
 
           const roomBeforeRemoval =
             await RoomServiceInstance.findRoomWithDoodler(roomId, doodlerId);
@@ -27,7 +28,7 @@ class SocketController implements SocketControllerInterface {
             doodlerId
           );
           socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_LEAVE, {
-            doodlerId
+            doodler
           });
 
           // Check for game validity in the room after removing the doodler
@@ -55,6 +56,30 @@ class SocketController implements SocketControllerInterface {
               room: updatedRoom,
               game
             });
+          } else if (
+            isValidGameRoom &&
+            room &&
+            roomBeforeRemoval.gameId &&
+            roomBeforeRemoval.drawerId === doodlerId
+          ) {
+            // The drawer left mid-turn - end it immediately instead of
+            // leaving everyone else waiting out the full choose-word/drawing
+            // timers with a drawer who's no longer here. The existing
+            // turn-end cooldown then advances to the next drawer as normal.
+            const game = await GameServiceInstance.findGame(
+              roomBeforeRemoval.gameId
+            );
+            if (
+              game.status === GameStatus.CHOOSE_WORD ||
+              game.status === GameStatus.GAME ||
+              game.status === GameStatus.ROUND_START
+            ) {
+              await GameServiceInstance.updateStatus(
+                roomBeforeRemoval.gameId,
+                GameStatus.TURN_END,
+                true
+              );
+            }
           }
         })
       ).finally(async () => {
