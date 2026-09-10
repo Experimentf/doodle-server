@@ -18,17 +18,13 @@ class GameController implements GameControllerInterface {
    */
   public handleGameOnGetGame: GameControllerInterface['handleGameOnGetGame'] =
     (socket) => async (payload, respond) => {
-      const { roomId, gameId } = payload;
+      const { roomId } = payload;
       const room = await RoomServiceInstance.findRoomWithDoodler(
         roomId,
         socket.id
       );
-      const game = await GameServiceInstance.findGame(gameId);
-      // const { data: isValidGameData } = GameService.isValidGame(roomId);
-      // // TODO: Check for room is public
-      // if (isValidGameData) {
-      //   GameServiceInstance.startGame(roomId);
-      // }
+      if (!room.gameId) throw new DoodleServerError('Game not found!');
+      const game = await GameServiceInstance.findGame(room.gameId);
 
       // Only the drawer should see the actual word - everyone else gets it
       // masked, same as the status-change broadcast in GameService does.
