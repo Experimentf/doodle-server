@@ -147,6 +147,30 @@ class RoomController implements RoomControllerInterface {
           room: updatedRoom,
           game
         });
+      } else if (
+        isValidGameRoom &&
+        room &&
+        roomBeforeRemoval.gameId &&
+        roomBeforeRemoval.drawerId === doodlerId
+      ) {
+        // The drawer left mid-turn - end it immediately instead of leaving
+        // everyone else waiting out the full choose-word/drawing timers with
+        // a drawer who's no longer here. The existing turn-end cooldown then
+        // advances to the next drawer as normal.
+        const game = await GameServiceInstance.findGame(
+          roomBeforeRemoval.gameId
+        );
+        if (
+          game.status === GameStatus.CHOOSE_WORD ||
+          game.status === GameStatus.GAME ||
+          game.status === GameStatus.ROUND_START
+        ) {
+          await GameServiceInstance.updateStatus(
+            roomBeforeRemoval.gameId,
+            GameStatus.TURN_END,
+            true
+          );
+        }
       }
 
       respond({ data: { success: true } });
