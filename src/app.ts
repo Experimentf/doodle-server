@@ -20,7 +20,7 @@ const app: Application = express();
 const httpServer = createServer(app);
 
 const allowedOrigins = [
-  process.env.DOODLE_CLIENT_URL,
+  ...(process.env.DOODLE_CLIENT_URL?.split(',').map((url) => url.trim()) ?? []),
   process.env.NETLIFY_DOODLE_CLIENT_URL
 ];
 
