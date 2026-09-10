@@ -17,6 +17,7 @@ class SocketController implements SocketControllerInterface {
       Promise.all(
         roomIds.map(async (roomId) => {
           const doodlerId = socket.id;
+          const doodler = await DoodlerServiceInstance.findDooder(doodlerId);
 
           const roomBeforeRemoval =
             await RoomServiceInstance.findRoomWithDoodler(roomId, doodlerId);
@@ -27,7 +28,7 @@ class SocketController implements SocketControllerInterface {
             doodlerId
           );
           socket.to(roomId).emit(RoomSocketEvents.EMIT_DOODLER_LEAVE, {
-            doodlerId
+            doodler
           });
 
           // Check for game validity in the room after removing the doodler
