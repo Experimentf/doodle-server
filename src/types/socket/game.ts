@@ -40,7 +40,7 @@ export interface PrivateGameOptions {
 
 export interface GameClientToServerEventsArgumentMap {
   [GameSocketEvents.ON_GET_GAME]: ClientToServerEventsArgument<
-    string,
+    { roomId: string; gameId: string },
     { game: GameInterface }
   >;
   [GameSocketEvents.ON_GAME_CANVAS_OPERATION]: ClientToServerEventsArgument<
