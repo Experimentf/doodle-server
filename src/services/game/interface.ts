@@ -21,7 +21,7 @@ export interface GameServiceInterface {
   updateCanvasOperations: (
     gameId: string,
     canvasOperation: CanvasOperation
-  ) => Promise<GameInterface>;
+  ) => Promise<boolean>;
   setDefaultOptions: (
     gameId: string,
     options: PrivateGameOptions

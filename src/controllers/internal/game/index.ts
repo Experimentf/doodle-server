@@ -40,15 +40,20 @@ class GameController implements GameControllerInterface {
   public handleGameOnGameCanvasOperation: GameControllerInterface['handleGameOnGameCanvasOperation'] =
     (socket) => async (payload, respond) => {
       const { roomId, canvasOperation } = payload;
-      const { gameId } = await RoomServiceInstance.findRoomWithDoodler(
-        roomId,
-        socket.id
-      );
+      const { gameId, drawerId } =
+        await RoomServiceInstance.findRoomWithDoodler(roomId, socket.id);
       if (!gameId) throw new DoodleServerError('Game not found!');
-      await GameServiceInstance.updateCanvasOperations(gameId, canvasOperation);
-      socket
-        .to(roomId)
-        .emit(GameSocketEvents.EMIT_GAME_CANVAS_OPERATION, { canvasOperation });
+      // Silently drop non-drawer strokes and ones racing a turn end, so a legit client never sees an error
+      const stored =
+        drawerId === socket.id &&
+        (await GameServiceInstance.updateCanvasOperations(
+          gameId,
+          canvasOperation
+        ));
+      if (stored)
+        socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_CANVAS_OPERATION, {
+          canvasOperation
+        });
       respond({ data: {} });
     };
 

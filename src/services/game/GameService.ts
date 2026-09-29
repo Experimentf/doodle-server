@@ -255,15 +255,16 @@ class GameService implements GameServiceInterface {
    *
    * @param gameId Game ID
    * @param canvasOperation Operation made on canvas
-   * @returns
+   * @returns true if stored, false if no turn is in progress
    */
   public async updateCanvasOperations(
     gameId: string,
     canvasOperation: CanvasOperation
   ) {
     const gameModel = await this._findGameModel(gameId);
+    if (gameModel.status !== GameStatus.GAME) return false;
     gameModel.addCanvasOperation(canvasOperation);
-    return gameModel.json;
+    return true;
   }
 
   /**
