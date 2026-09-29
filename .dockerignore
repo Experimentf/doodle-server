@@ -31,3 +31,6 @@ node_modules
 npm-debug.log
 
 .DS_Store
+
+# Ops tooling, not part of the server image
+tools
