@@ -43,9 +43,10 @@ export interface GameClientToServerEventsArgumentMap {
     { roomId: string },
     { game: GameInterface }
   >;
+  // Empty ack: echoing the game (with full canvas history) grew per stroke and OOM'd the server
   [GameSocketEvents.ON_GAME_CANVAS_OPERATION]: ClientToServerEventsArgument<
     { roomId: string; canvasOperation: CanvasOperation },
-    { game: GameInterface }
+    Record<string, never>
   >;
   [GameSocketEvents.ON_GAME_CHOOSE_WORD]: ClientToServerEventsArgument<
     { roomId: string; word: string },

@@ -45,14 +45,11 @@ class GameController implements GameControllerInterface {
         socket.id
       );
       if (!gameId) throw new DoodleServerError('Game not found!');
-      const game = await GameServiceInstance.updateCanvasOperations(
-        gameId,
-        canvasOperation
-      );
+      await GameServiceInstance.updateCanvasOperations(gameId, canvasOperation);
       socket
         .to(roomId)
         .emit(GameSocketEvents.EMIT_GAME_CANVAS_OPERATION, { canvasOperation });
-      respond({ data: { game } });
+      respond({ data: {} });
     };
 
   public handleGameOnChooseWord: GameControllerInterface['handleGameOnChooseWord'] =
