@@ -9,6 +9,10 @@ class DoodlerService implements DoodlerServiceInterface {
     DoodlerModel
   >(); // DOODLER ID -> DOODLER DETAILS
 
+  public get count() {
+    return this._doodlers.size;
+  }
+
   /**
    * Add a doodler to the list of doodlers
    * @param doodlerProps Properties to be set for the new doodler

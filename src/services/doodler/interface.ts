@@ -1,6 +1,7 @@
 import { DoodlerInterface } from '@/types/socket/doodler';
 
 export interface DoodlerServiceInterface {
+  readonly count: number;
   addDoodler: (doodler: {
     id: string;
     name: string;
