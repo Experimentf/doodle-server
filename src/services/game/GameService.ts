@@ -128,45 +128,6 @@ class GameService implements GameServiceInterface {
       };
     }
 
-    // Inform status change to invloved clients
-    if (informAffectedClients) {
-      if (status === GameStatus.GAME) {
-        if (room.drawerId) {
-          // Send the hidden word for non-drawing clients
-          SocketServiceInstance.emitEventInRoomExceptOne(
-            room.id,
-            room.drawerId,
-            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-            [
-              {
-                room,
-                game: hideWord(gameModel.json),
-                statusChangeData
-              }
-            ]
-          );
-          // Send the exact word for drawing client
-          SocketServiceInstance.emitEvent(
-            room.drawerId,
-            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-            [{ room, game: gameModel.json, statusChangeData }]
-          );
-        }
-      } else {
-        SocketServiceInstance.emitEvent(
-          gameModel.roomId,
-          GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
-          [
-            {
-              room,
-              game: gameModel.json,
-              statusChangeData
-            }
-          ]
-        );
-      }
-    }
-
     if (status === GameStatus.GAME) {
       gameModel.resetTimer();
       // Start drawing time
@@ -247,6 +208,45 @@ class GameService implements GameServiceInterface {
           }
         }
       );
+    }
+
+    // Inform after arming the phase timer so the payload's timeLeft covers the new phase
+    if (informAffectedClients) {
+      if (status === GameStatus.GAME) {
+        if (room.drawerId) {
+          // Send the hidden word for non-drawing clients
+          SocketServiceInstance.emitEventInRoomExceptOne(
+            room.id,
+            room.drawerId,
+            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+            [
+              {
+                room,
+                game: hideWord(gameModel.json),
+                statusChangeData
+              }
+            ]
+          );
+          // Send the exact word for drawing client
+          SocketServiceInstance.emitEvent(
+            room.drawerId,
+            GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+            [{ room, game: gameModel.json, statusChangeData }]
+          );
+        }
+      } else {
+        SocketServiceInstance.emitEvent(
+          gameModel.roomId,
+          GameSocketEvents.EMIT_GAME_STATUS_UPDATED,
+          [
+            {
+              room,
+              game: gameModel.json,
+              statusChangeData
+            }
+          ]
+        );
+      }
     }
     return gameModel.json;
   }

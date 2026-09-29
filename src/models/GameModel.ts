@@ -17,6 +17,7 @@ class GameModel {
   private _options: GameOptions = this._defaultOptions;
   private _canvasOperationsStack = new Stack<CanvasOperation>();
   private _timer: NodeJS.Timer | null = null;
+  private _phaseEndsAt?: number;
   private _roomId: string;
   private _previousDrawerSet: Set<string> = new Set();
   private _hunchTimes: Array<[string, number]> = [];
@@ -127,7 +128,12 @@ class GameModel {
       id: this.id,
       status: this._status,
       options: this._options,
-      canvasOperations: this._canvasOperationsStack.toArray()
+      canvasOperations: this._canvasOperationsStack.toArray(),
+      // Relative ms (not a timestamp) so clients don't depend on their clock matching the server's
+      timeLeft:
+        this._phaseEndsAt !== undefined
+          ? Math.max(0, this._phaseEndsAt - Date.now())
+          : undefined
     };
   }
 
@@ -136,6 +142,7 @@ class GameModel {
   }
 
   public startTimer(timeInSeconds: number, callback: () => void) {
+    this._phaseEndsAt = Date.now() + timeInSeconds * 1000;
     this._timer = setInterval(() => {
       callback();
     }, timeInSeconds * 1000);
@@ -144,6 +151,7 @@ class GameModel {
   public resetTimer() {
     if (this._timer) clearInterval(this._timer);
     this._timer = null;
+    this._phaseEndsAt = undefined;
   }
 
   // PRIVATE METHODS
