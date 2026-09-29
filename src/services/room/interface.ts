@@ -3,6 +3,7 @@ import { GameInterface } from '@/types/socket/game';
 import { RoomInterface } from '@/types/socket/room';
 
 export interface RoomServiceInterface {
+  readonly count: number;
   // FUNDAMENTALS
   createRoom: (ownerId?: string) => Promise<RoomInterface>;
   isValidGameRoom: (roomId: string) => Promise<boolean>;

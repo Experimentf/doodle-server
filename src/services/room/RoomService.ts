@@ -10,6 +10,10 @@ import { RoomServiceInterface } from './interface';
 class RoomService implements RoomServiceInterface {
   private _rooms: RoomInfoMapType = new Map<string, RoomModel>(); // ROOM ID -> ROOM DETAILS
 
+  public get count() {
+    return this._rooms.size;
+  }
+
   /**
    * Create a new room
    * @param ownerId - Doodler ID who is the owner of this new room. If undefined, the room will be public.

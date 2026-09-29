@@ -6,6 +6,7 @@ import {
 } from '@/types/socket/game';
 
 export interface GameServiceInterface {
+  readonly count: number;
   // FUNDAMENTALS
   findGame: (gameId: string) => Promise<GameInterface>;
   startGame: (gameId: string) => Promise<void>;

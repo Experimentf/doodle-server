@@ -24,6 +24,10 @@ import { GameServiceInterface } from './interface';
 class GameService implements GameServiceInterface {
   private _games: GameInfoMapType = new Map<string, GameModel>(); // GAME ID -> GAME DETAILS
 
+  public get count() {
+    return this._games.size;
+  }
+
   /**
    *
    * @param gameId Game ID for which game needs to be started
