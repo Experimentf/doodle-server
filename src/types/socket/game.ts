@@ -19,6 +19,8 @@ export interface HunchInterface {
   message: string;
   status?: HunchStatus;
   isSystemMessage: boolean;
+  // Set on correct-hunch system messages, which have no senderId
+  guesserId?: DoodlerInterface['id'];
 }
 
 export interface GameStatusChangeData {

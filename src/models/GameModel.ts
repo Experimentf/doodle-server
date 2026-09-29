@@ -83,6 +83,10 @@ class GameModel {
     return this._hunchTimes.length;
   }
 
+  public hasHunched(doodlerId: string) {
+    return this._hunchTimes.some(([id]) => id === doodlerId);
+  }
+
   public calculateScoresByHunchTime() {
     const scores: Record<string, number> = {};
     if (this.nHunches === 0) return scores;
@@ -129,6 +133,8 @@ class GameModel {
       status: this._status,
       options: this._options,
       canvasOperations: this._canvasOperationsStack.toArray(),
+      // Who has hunched the word this turn, so late joiners see the right count
+      hunchedIds: this._hunchTimes.map(([id]) => id),
       // Relative ms (not a timestamp) so clients don't depend on their clock matching the server's
       timeLeft:
         this._phaseEndsAt !== undefined
