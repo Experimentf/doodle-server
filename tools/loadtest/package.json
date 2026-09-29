@@ -1,0 +1,11 @@
+{
+  "name": "doodle-loadtest",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bots": "node bots.mjs"
+  },
+  "dependencies": {
+    "socket.io-client": "4.8.1"
+  }
+}
