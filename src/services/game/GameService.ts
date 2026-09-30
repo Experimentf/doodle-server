@@ -91,7 +91,10 @@ class GameService implements GameServiceInterface {
 
     if (status !== GameStatus.GAME) gameModel.clearCanvasOperations();
     if (status === GameStatus.TURN_END) {
-      const scores = gameModel.calculateScoresByHunchTime();
+      const scores = gameModel.calculateTurnScores(
+        room.drawerId,
+        Math.max(0, room.doodlers.length - 1)
+      );
       statusChangeData = {
         [GameStatus.TURN_END]: {
           scores
@@ -130,6 +133,7 @@ class GameService implements GameServiceInterface {
 
     if (status === GameStatus.GAME) {
       gameModel.resetTimer();
+      gameModel.startTurn();
       // Start drawing time
       gameModel.startTimer(gameModel.options.timers.drawing.max, async () => {
         this.updateStatus(gameId, GameStatus.TURN_END, true);
