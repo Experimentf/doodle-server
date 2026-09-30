@@ -311,6 +311,7 @@ class GameService implements GameServiceInterface {
     doodlerId
   ) => {
     const gameModel = await this._findGameModel(gameId);
+    if (gameModel.hasHunched(doodlerId)) return;
     gameModel.addHunchTime(doodlerId, Date.now());
     const room = await RoomServiceInstance.findRoom(gameModel.roomId);
     // TODO : FIX THIS BUG LATER TO CHECK IF ALL HUNCHES ARE BY CURRENT PLAYERS ONLY

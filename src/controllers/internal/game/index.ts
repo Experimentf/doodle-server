@@ -90,13 +90,29 @@ class GameController implements GameControllerInterface {
           room.gameId,
           message
         );
+        // Someone who already hunched knows the word: a repeat must not count again,
+        // and a correct or near spelling must not reach the others as a hint.
+        if (
+          game.hunchedIds.includes(socket.id) &&
+          hunchStatus !== HunchStatus.WRONG
+        ) {
+          respond({
+            data: {
+              hunch: createHunch(
+                "You've already hunched the word - keep it secret!",
+                HunchStatus.WRONG
+              )
+            }
+          });
+          return;
+        }
         // If the hunch is correct, send a system message to all clients
         if (hunchStatus === HunchStatus.CORRECT) {
           const doodler = await DoodlerServiceInstance.findDooder(socket.id);
-          const hunch = createHunch(
-            `${doodler.name} hunched the word!`,
-            hunchStatus
-          );
+          const hunch = {
+            ...createHunch(`${doodler.name} hunched the word!`, hunchStatus),
+            guesserId: doodler.id
+          };
           await GameServiceInstance.addHunchTime(game.id, doodler.id);
           socket.to(roomId).emit(GameSocketEvents.EMIT_GAME_HUNCH, { hunch });
           respond({ data: { hunch } });
