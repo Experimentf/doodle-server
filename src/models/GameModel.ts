@@ -1,6 +1,7 @@
 import { DEFAULT_GAME_OPTIONS } from '@/constants/game';
 import { CanvasOperation, GameOptions, GameStatus } from '@/types/game';
 import { PrivateGameOptions } from '@/types/socket/game';
+import { calculateTurnScores } from '@/utils/scoring';
 import Stack from '@/utils/stack';
 import { generateId } from '@/utils/unique';
 
@@ -21,6 +22,7 @@ class GameModel {
   private _roomId: string;
   private _previousDrawerSet: Set<string> = new Set();
   private _hunchTimes: Array<[string, number]> = [];
+  private _turnStartedAt?: number;
 
   constructor(roomId: string, options?: Partial<GameOptions>) {
     this.id = generateId();
@@ -70,6 +72,12 @@ class GameModel {
     );
   }
 
+  // Turn
+  public startTurn() {
+    this.clearHunchTimes();
+    this._turnStartedAt = Date.now();
+  }
+
   // Hunch Time
   public addHunchTime(doodlerId: string, timestamp: number) {
     this._hunchTimes.push([doodlerId, timestamp]);
@@ -87,25 +95,20 @@ class GameModel {
     return this._hunchTimes.some(([id]) => id === doodlerId);
   }
 
-  public calculateScoresByHunchTime() {
-    const scores: Record<string, number> = {};
-    if (this.nHunches === 0) return scores;
-    const sortedHunchTimes = [...this._hunchTimes].sort((a, b) => a[1] - b[1]);
-    const maxScore = 100;
-    const maxTimestamp = Math.max(
-      ...sortedHunchTimes.map((hunchTimes) => hunchTimes[1])
-    );
-    const minTimestamp = Math.min(
-      ...sortedHunchTimes.map((hunchTimes) => hunchTimes[1])
-    );
-    const timeRange = maxTimestamp - minTimestamp;
-    sortedHunchTimes.forEach(([id, time]) => {
-      const relativeTimeDifference =
-        (time - minTimestamp) / (timeRange != 0 ? timeRange : 1);
-      const score = ((1 - relativeTimeDifference) / 2 + 0.5) * maxScore;
-      scores[id] = Math.floor(score);
+  public calculateTurnScores(
+    drawerId: string | undefined,
+    eligibleGuessers: number
+  ) {
+    return calculateTurnScores({
+      guesses: this._hunchTimes.map(([doodlerId, timestamp]) => ({
+        doodlerId,
+        timestamp
+      })),
+      drawerId,
+      turnStartedAt: this._turnStartedAt ?? Date.now(),
+      turnDurationMs: this._options.timers.drawing.max * 1000,
+      eligibleGuessers
     });
-    return scores;
   }
 
   // Status
