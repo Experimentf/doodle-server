@@ -27,7 +27,7 @@ app.get('/health', (_req, res) => {
 app.get('/metrics', metricsHandler);
 
 const allowedOrigins = [
-  ...(process.env.DOODLE_CLIENT_URL?.split(',').map((url) => url.trim()) ?? []),
+  ...(process.env.DOODLE_CLIENT_URL?.split(',').map((url) => url.trim()) ?? [])
 ];
 
 const isOriginAllowed = (origin?: string) =>
